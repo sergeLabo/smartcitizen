@@ -1,0 +1,98 @@
+#:kivy 1.11.1
+
+<SmartCitizen>:
+    orientation: 'vertical'
+    ActionBar:
+        pos_hint: {"top": 1}
+        icon: self.icon
+
+        ActionView:
+            use_separator: False
+            ActionPrevious:
+                markup: True
+                title: '[b]Smart Citizen[/b]'
+                with_previous: False
+                app_icon: './images/icon_labo.png'
+                color: (1, 0, 0.5, 1)
+                font_size: '[size]40sp[/size]'
+            ActionOverflow:
+            ActionButton:
+                icon: './images/icon_labo.png'
+            ActionButton:
+                # #important: True  # place après Btn2 !
+                text: 'Ecran 1'
+                on_release: app.root.ids.sm.current = "first"
+            ActionButton:
+                text: 'Ecran 2'
+                on_release: app.root.ids.sm.current = "second"
+            ActionGroup:
+                text: 'Options'
+                ActionButton:
+                    text: 'Options'
+                    on_release: app.open_settings()
+                ActionButton:
+                    text: 'Main'
+                    on_release: app.root.ids.sm.current = "main"
+
+    ScreenManager:
+        id: sm
+        MainScreen:
+        Screen1:
+        Screen2:
+
+<MainScreen>:
+    name: 'main'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: './images/labo_bgd.png'
+
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10, 10
+        Label:
+            text: 'Smart Citizen'
+            font_size: "20sp"
+
+<Screen1>:
+    name: 'first'
+    BoxLayout:
+        orientation: 'vertical'
+        ScrollView:
+            id: scrollview
+            do_scroll_x: False
+            do_scroll_y: True
+            Label:
+                # root est Screen1
+                # app est SmartCitizenApp à passer dans SmartCitizen avec app !
+                # self est ce label
+                id: scroll
+                size_hint_y: None
+                text_size: root.width, None
+                size: self.texture_size
+                height: self.size[1]
+                width: self.size[0]
+                padding: 10, 10
+                # app est l'objet SmartCitizenApp
+                text: app.text
+                color: 1, 0, 0.5, 1
+                font_size: app.font_size_sp
+
+<Screen2>:
+    name: 'second'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'SmartCitizen'
+            font_size: 50
+
+        BoxLayout:
+            Button:
+                text: 'Back to toto'
+                font_size: 30
+                on_release: app.root.ids.sm.current = 'main'
+            Button:
+                text: 'bla bla'
+                font_size: 30
+                on_release: app.root.ids.sm.current = 'main'

@@ -1,0 +1,6 @@
+
+curl -XPOST https://api.smartcitizen.me/v0/sessions -d "username=sergeblender" -d "password=xG.......36"
+
+{"access_token":"3135dd8ea0e628c3703e8e46bc8b70c8be81eebfb9f32c1065a4b3ff98dc4fc3"}
+
+
