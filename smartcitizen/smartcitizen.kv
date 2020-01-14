@@ -16,23 +16,26 @@
                 color: (1, 0, 0.5, 1)
                 font_size: '[size]40sp[/size]'
             ActionOverflow:
-            ActionButton:
-                icon: './images/icon_labo.png'
+            # #ActionButton:
+                # #icon: './images/icon_labo.png'
             ActionButton:
                 # #important: True  # place après Btn2 !
-                text: 'Ecran 1'
+                text: 'Capteurs'
                 on_release: app.root.ids.sm.current = "first"
-            ActionButton:
-                text: 'Ecran 2'
-                on_release: app.root.ids.sm.current = "second"
             ActionGroup:
-                text: 'Options'
+                text: 'Menu'
                 ActionButton:
                     text: 'Options'
                     on_release: app.open_settings()
                 ActionButton:
-                    text: 'Main'
+                    text: 'Historique'
+                    on_release: app.root.ids.sm.current = "second"
+                ActionButton:
+                    text: "Accueil"
                     on_release: app.root.ids.sm.current = "main"
+                ActionButton:
+                    text: 'Quitter'
+                    on_release: app.do_quit()
 
     ScreenManager:
         id: sm
@@ -50,34 +53,92 @@
 
     BoxLayout:
         orientation: "vertical"
-        padding: 10, 10
         Label:
+            size_hint_y: 0.25
             text: 'Smart Citizen'
-            font_size: "20sp"
+            font_size: "40sp"
+        BoxLayout:
+            size_hint_y: 0.55
+        BoxLayout:
+            size_hint_y: 0.1
+            GridLayout:
+                cols: 3
+                BoxLayout:
+                Button:
+                    text: 'Capteurs'
+                    on_release: app.root.ids.sm.current = "first"
+                BoxLayout:
+        BoxLayout:
+            size_hint_y: 0.10
+
 
 <Screen1>:
     name: 'first'
+    blanche: blanche
     BoxLayout:
         orientation: 'vertical'
-        ScrollView:
-            id: scrollview
-            do_scroll_x: False
-            do_scroll_y: True
-            Label:
-                # root est Screen1
-                # app est SmartCitizenApp à passer dans SmartCitizen avec app !
-                # self est ce label
-                id: scroll
-                size_hint_y: None
-                text_size: root.width, None
-                size: self.texture_size
-                height: self.size[1]
-                width: self.size[0]
-                padding: 10, 10
-                # app est l'objet SmartCitizenApp
-                text: app.text
-                color: 1, 0, 0.5, 1
-                font_size: app.font_size_sp
+        Label:
+            canvas.before:
+                Color:
+                    rgba: 0.4, 0.4, 0.4, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            size_hint_y: 0.05
+            text: "Liste des capteurs"
+            color: 1, 0, 0.5, 1
+        BoxLayout:
+            size_hint_y: 0.95
+            orientation: 'vertical'
+            ScrollView:
+                size: self.size
+                do_scroll_x: False
+                do_scroll_y: True
+
+                GridLayout:
+                    id: blanche
+                    size_hint_y: None
+                    cols: 1
+                    height: self.minimum_height
+                    row_default_height: '80dp'
+                    row_force_default: True
+                    spacing: 10, 10
+                    padding: 10, 40
+
+                    Button:
+
+                        text: root.text_btns[0]
+                    Button:
+                        text: root.text_btns[1]
+                    Button:
+                        text: root.text_btns[2]
+                    Button:
+                        text: root.text_btns[3]
+                    Button:
+                        text: root.text_btns[4]
+                    Button:
+                        text: root.text_btns[5]
+                    Button:
+                        text: root.text_btns[6]
+                    Button:
+                        text: root.text_btns[7]
+                    Button:
+                        text: root.text_btns[8]
+                    Button:
+                        text: root.text_btns[9]
+                    Button:
+                        text: root.text_btns[10]
+                    Button:
+                        text: root.text_btns[11]
+                    Button:
+                        text: root.text_btns[12]
+                    Button:
+                        text: root.text_btns[13]
+                    Button:
+                        text: root.text_btns[14]
+                    Button:
+                        text: root.text_btns[15]
 
 <Screen2>:
     name: 'second'

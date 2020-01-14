@@ -99,7 +99,6 @@ class SmartCitizenRequests:
             if "sensors" in resp_dict["data"]:
                 # #print(resp_dict["data"]["sensors"])
                 for sens_dict in resp_dict["data"]["sensors"]:
-                    # #print(sens_dict)
                     data.append([sens_dict["description"],
                                  sens_dict["unit"],
                                  sens_dict["value"]])
@@ -115,4 +114,6 @@ if __name__ == '__main__':
     scr = SmartCitizenRequests(url, device, device_nbr)
     resp_dict = scr.get_one_request()
     scr.get_data(resp_dict)
-    print(scr.data)
+
+    for item in scr.data:
+        print(item)

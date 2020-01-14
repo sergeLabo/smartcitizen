@@ -28,14 +28,14 @@ long_line_behaviour=1
 long_line_column=80
 
 [files]
-current_page=6
-FILE_NAME_0=0;None;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2FCopyright;0;4
-FILE_NAME_1=536;Markdown;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2FREADME.md;0;4
-FILE_NAME_2=21;Conf;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fsmartcitizen.ini;0;4
-FILE_NAME_3=779;Python;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fsmartcitizen_requests.py;0;4
-FILE_NAME_4=978;Kv;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fsmartcitizen.kv;0;4
-FILE_NAME_5=779;Python;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fmain.py;0;4
-FILE_NAME_6=5206;Python;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fapprendre-kivy%2Fapprendre_kivy%2Fserverkivy.py;0;4
+current_page=0
+FILE_NAME_0=1499;None;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2F.gitignore;0;4
+FILE_NAME_1=0;None;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2FCopyright;0;4
+FILE_NAME_2=218;Markdown;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2FREADME.md;0;4
+FILE_NAME_3=21;Conf;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fsmartcitizen.ini;0;4
+FILE_NAME_4=3380;Python;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fsmartcitizen_requests.py;0;4
+FILE_NAME_5=3952;Kv;0;EUTF-8;0;1;0;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fsmartcitizen.kv;0;4
+FILE_NAME_6=3064;Python;0;EUTF-8;0;1;1;%2Fmedia%2Fdata%2F3D%2Fprojets%2Fsmartcitizen%2Fsmartcitizen%2Fmain.py;0;4
 
 [VTE]
 last_dir=/home

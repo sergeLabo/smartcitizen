@@ -1,6 +1,6 @@
 # Smart Citizen
 
-##
+### TODO
 
 Contexte:
 * Debian 10 Buster
@@ -9,7 +9,7 @@ Contexte:
 
 ### La documentation sur le wiki ressources.labomedia.org
 
-[Smart Citizen](https://ressources.labomedia.org/apprendre_kivy)
+[Smart Citizen](https://ressources.labomedia.org/kivy_application_android_smart_citizen)
 
 ### License and Copyright
 
