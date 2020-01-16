@@ -55,11 +55,11 @@ class Screen2(Screen):
 class Sensor(BoxLayout):
 
     index = NumericProperty()
+    text = StringProperty("toto")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         print("index", self.index)
-
 
 class Screen1(Screen):
     blanche = ObjectProperty(None)
@@ -69,6 +69,13 @@ class Screen1(Screen):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        Clock.schedule_interval(self.update, 1)
+
+    def update(self, dt):
+        some = self.ids.s0
+        print([type(widget) for widget in some.walk(loopback=True)])
+        some.text = "tata"
+
 
     def on_button_state(self, instance, value):
         """Call if button state change."""

@@ -41,6 +41,9 @@ class SmartCitizenRequests:
 
         self.request_url = self.get_request_url()
         self.data = None
+        self.resp_dict = self.get_one_request()
+        self.data = self.get_data()
+        self.owner = self.get_owner()
 
     def get_request_url(self):
         """url ne doit pas se terminer par /
@@ -86,7 +89,7 @@ class SmartCitizenRequests:
 
         return resp_dict
 
-    def get_data(self, resp_dict):
+    def get_data(self):
         """
         [["Temp", "°C", 25.3], ...  ]
         # #for i in ["description", "unit", "value"]:
@@ -95,25 +98,30 @@ class SmartCitizenRequests:
         """
 
         data = []
-        if "data" in resp_dict:
-            if "sensors" in resp_dict["data"]:
-                # #print(resp_dict["data"]["sensors"])
-                for sens_dict in resp_dict["data"]["sensors"]:
+        if "data" in self.resp_dict:
+            if "sensors" in self.resp_dict["data"]:
+                for sens_dict in self.resp_dict["data"]["sensors"]:
                     data.append([sens_dict["description"],
                                  sens_dict["unit"],
                                  sens_dict["value"]])
 
-        self.data = data
+        return data
+
+    def get_owner(self):
+        try:
+            owner = (self.resp_dict["owner"]["username"],
+                    self.resp_dict["owner"]["url"])
+        except:
+            owner = ("Kit", "inexistant")
+        return owner
 
 
 if __name__ == '__main__':
 
     url = "http://api.smartcitizen.me/v0/"
     device = "devices"
-    device_nbr = str(9565)
+    device_nbr = str(9525)
     scr = SmartCitizenRequests(url, device, device_nbr)
-    resp_dict = scr.get_one_request()
-    scr.get_data(resp_dict)
+    scr.get_one_request()
 
-    for item in scr.data:
-        print(item)
+    print(scr.data, scr.owner)

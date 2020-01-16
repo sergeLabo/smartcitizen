@@ -1,0 +1,423 @@
+#:kivy 1.11.1
+
+<SmartCitizen>:
+    orientation: 'vertical'
+    ActionBar:
+        pos_hint: {"top": 1}
+        icon: self.icon
+
+        ActionView:
+            use_separator: False
+            ActionPrevious:
+                markup: True
+                title: '[b]Smart Citizen[/b]'
+                with_previous: False
+                app_icon: './images/icon_labo.png'
+                color: (1, 0, 0.5, 1)
+                font_size: '[size]40sp[/size]'
+            ActionOverflow:
+            # #ActionButton:
+                # #icon: './images/icon_labo.png'
+            ActionButton:
+                # #important: True  # place après Btn2 !
+                text: 'Capteurs'
+                on_release: app.root.ids.sm.current = "first"
+            ActionGroup:
+                text: 'Menu'
+                ActionButton:
+                    text: 'Options'
+                    on_release: app.open_settings()
+                ActionButton:
+                    text: 'Historique'
+                    on_release: app.root.ids.sm.current = "second"
+                ActionButton:
+                    text: "Accueil"
+                    on_release: app.root.ids.sm.current = "main"
+                ActionButton:
+                    text: 'Quitter'
+                    on_release: app.do_quit()
+
+    ScreenManager:
+        id: sm
+        MainScreen:
+        Screen1:
+        Screen2:
+
+<MainScreen>:
+    name: 'main'
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: './images/labo_bgd.png'
+
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            size_hint_y: 0.25
+            text: 'Smart Citizen'
+            font_size: "40sp"
+        BoxLayout:
+            size_hint_y: 0.55
+        BoxLayout:
+            size_hint_y: 0.1
+            GridLayout:
+                cols: 3
+                BoxLayout:
+                Button:
+                    text: 'Capteurs'
+                    on_release: app.root.ids.sm.current = "first"
+                BoxLayout:
+        BoxLayout:
+            size_hint_y: 0.10
+
+<Sensor>:
+    BoxLayout:
+        orientation: 'horizontal'
+        Button:
+            size_hint_x: 0.60
+            text: "toto"  # root.btns_text[0]
+        Label:
+            canvas.before:
+                Color:
+                    rgba: 0.4, 0.4, 0.4, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            size_hint_x: 0.40
+            markup: True
+            text: self.text
+            color: 1, 0, 0.5, 1
+            font_size: '20sp'
+
+<Screen1>:
+    name: 'first'
+    blanche: blanche
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            size_hint_y: 0.10
+            markup: True
+            text: '[b]' + root.titre_text + '[/b]'
+
+            color: 1, 0, 0.5, 1
+        BoxLayout:
+            size_hint_y: 0.90
+            orientation: 'vertical'
+            ScrollView:
+                size: self.size
+                do_scroll_x: False
+                do_scroll_y: True
+
+                GridLayout:
+                    id: blanche
+                    size_hint_y: None
+                    cols: 1
+                    height: self.minimum_height
+                    row_default_height: '160dp'
+                    row_force_default: True
+                    spacing: 10, 10
+                    padding: 10, 40
+
+                    Sensor:
+                        id: s0
+                        index: 0
+                        text: self.text
+                        # #text: '[b]' + root.labels_text[0] + '[/b]'
+
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[0]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[0] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[1]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[1] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[2]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[2] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[3]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[3] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[4]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[4] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[5]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[5] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[6]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[6] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[7]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[7] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[8]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[8] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[9]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[9] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[10]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[10] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[11]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[11] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[12]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[12] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[13]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[13] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[14]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[14] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+                    # #BoxLayout:
+                        # #orientation: 'horizontal'
+                        # #Button:
+                            # #size_hint_x: 0.60
+                            # #text: root.btns_text[15]
+                        # #Label:
+                            # #canvas.before:
+                                # #Color:
+                                    # #rgba: 0.4, 0.4, 0.4, 1
+                                # #Rectangle:
+                                    # #pos: self.pos
+                                    # #size: self.size
+                            # #size_hint_x: 0.40
+                            # #markup: True
+                            # #text: '[b]' + root.labels_text[15] + '[/b]'
+                            # #color: 1, 0, 0.5, 1
+                            # #font_size: '20sp'
+
+<Screen2>:
+    name: 'second'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'SmartCitizen'
+            font_size: 50
+
+        BoxLayout:
+            Button:
+                text: 'Back to toto'
+                font_size: 30
+                on_release: app.root.ids.sm.current = 'main'
+            Button:
+                text: 'bla bla'
+                font_size: 30
+                on_release: app.root.ids.sm.current = 'main'

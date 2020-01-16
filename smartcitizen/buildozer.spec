@@ -1,0 +1,32 @@
+[app]
+
+title = Smart Citizen
+
+package.name = smartcitizen
+package.domain = org.test
+
+source.dir = .
+
+source.include_exts = py,png,jpg,kv,atlas
+
+source.exclude_dirs = old, bin, recherche
+
+source.include_patterns = images/*.jpg,images/*.png
+
+version.regex = __version__ = ['"](.*)['"]
+version.filename = %(source.dir)s/main.py
+
+requirements = python3,kivy,requests
+
+orientation = all
+
+fullscreen = 0
+
+android.permissions = INTERNET
+
+android.arch = armeabi-v7a
+
+[buildozer]
+
+log_level = 2
+warn_on_root = 1
