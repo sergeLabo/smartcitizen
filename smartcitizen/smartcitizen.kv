@@ -71,25 +71,6 @@
         BoxLayout:
             size_hint_y: 0.10
 
-<Sensor>:
-    BoxLayout:
-        orientation: 'horizontal'
-        Button:
-            size_hint_x: 0.60
-            text: root.btns_text[0]
-        Label:
-            canvas.before:
-                Color:
-                    rgba: 0.4, 0.4, 0.4, 1
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-            size_hint_x: 0.40
-            markup: True
-            text: '[b]' + root.labels_text[0] + '[/b]'
-            color: 1, 0, 0.5, 1
-            font_size: '20sp'
-
 <Screen1>:
     name: 'first'
     blanche: blanche
@@ -104,8 +85,7 @@
                     size: self.size
             size_hint_y: 0.10
             markup: True
-            text: '[b]' + root.titre_text + '[/b]'
-
+            text: '[b]' + root.owner_titre + '[/b]'
             color: 1, 0, 0.5, 1
         BoxLayout:
             size_hint_y: 0.90
@@ -133,7 +113,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -142,6 +122,9 @@
                             text: '[b]' + root.labels_text[0] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -150,7 +133,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -159,6 +142,9 @@
                             text: '[b]' + root.labels_text[1] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -167,7 +153,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -176,6 +162,9 @@
                             text: '[b]' + root.labels_text[2] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -184,7 +173,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -193,6 +182,9 @@
                             text: '[b]' + root.labels_text[3] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -201,7 +193,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -210,6 +202,9 @@
                             text: '[b]' + root.labels_text[4] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -218,7 +213,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -227,6 +222,9 @@
                             text: '[b]' + root.labels_text[5] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -235,7 +233,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -244,6 +242,9 @@
                             text: '[b]' + root.labels_text[6] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -252,7 +253,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -261,6 +262,9 @@
                             text: '[b]' + root.labels_text[7] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -269,7 +273,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -278,6 +282,9 @@
                             text: '[b]' + root.labels_text[8] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -286,7 +293,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -295,6 +302,9 @@
                             text: '[b]' + root.labels_text[9] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -303,7 +313,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -312,6 +322,9 @@
                             text: '[b]' + root.labels_text[10] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -320,7 +333,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -329,6 +342,9 @@
                             text: '[b]' + root.labels_text[11] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -337,7 +353,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -346,6 +362,9 @@
                             text: '[b]' + root.labels_text[12] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -354,7 +373,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -363,6 +382,9 @@
                             text: '[b]' + root.labels_text[13] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -371,7 +393,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -380,6 +402,9 @@
                             text: '[b]' + root.labels_text[14] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
                     BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -388,7 +413,7 @@
                         Label:
                             canvas.before:
                                 Color:
-                                    rgba: 0.4, 0.4, 0.4, 1
+                                    rgba: 0.8, 0.8, 0.8, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -397,21 +422,48 @@
                             text: '[b]' + root.labels_text[15] + '[/b]'
                             color: 1, 0, 0.5, 1
                             font_size: '20sp'
+                            text_size: self.size
+                            halign: 'center'
+                            valign: 'middle'
+
+<MyGraph>:
+    BoxLayout:
+        size_hint_y: 1.0
+        Graph:
+            background_color: 0, 1, 1, 1
+            border_color: 1, 1, 0, 1
+            xlabel: 'X'
+            ylabel: 'Y'
+            x_ticks_minor: 5
+            x_ticks_major: 25
+            y_ticks_major: 1
+            y_grid_label: True
+            x_grid_label: True
+            padding: 5
+            x_grid: True
+            y_grid: True
+            xmin:0
+            xmax:100
+            ymin:-1
+            ymax:1
 
 <Screen2>:
     name: 'second'
     BoxLayout:
         orientation: 'vertical'
-        Label:
-            text: 'SmartCitizen'
-            font_size: 50
+        size_hint_y: 0.90
 
-        BoxLayout:
+        MyGraph:
+            id: graph
+
+        BoxLayout: # 2 button en bas
+            orientation: 'horizontal'
+            size_hint_y: 0.10
             Button:
-                text: 'Back to toto'
+                text: "Retour à l'accueil"
                 font_size: 30
                 on_release: app.root.ids.sm.current = 'main'
             Button:
-                text: 'bla bla'
+                text: 'Retour aux capteurs'
                 font_size: 30
-                on_release: app.root.ids.sm.current = 'main'
+                on_release: app.root.ids.sm.current = 'first'

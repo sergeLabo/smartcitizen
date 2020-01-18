@@ -36,6 +36,7 @@ if sys.platform == 'linux':
     Window.size = WS
 
 import textwrap
+from math import sin
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -44,28 +45,37 @@ from kivy.properties import StringProperty, ObjectProperty
 from kivy.properties import ListProperty, NumericProperty
 from kivy.clock import Clock
 from kivy.uix.button import Button
+from kivy.uix.widget import Widget
+from kivy_garden.graph import Graph, MeshLinePlot
 
 from smartcitizen_requests import SmartCitizenRequests
 
+class MyGraph(Widget):
 
-class Screen2(Screen):
     pass
 
 
-class Sensor(BoxLayout):
+class Screen2(Screen):
 
-    index = NumericProperty()
+    graph = ObjectProperty()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        print("index", self.index)
+
+        print([type(widget) for widget in self.walk(loopback=True)])
+
+        plot = MeshLinePlot(color=[1, 0, 0, 1])
+        plot.points = [(x, sin(x / 10.)) for x in range(0, 101)]
+        # #self.ids.graph.add_plot(plot)
 
 
 class Screen1(Screen):
     blanche = ObjectProperty(None)
     btns_text = ListProperty(["Smart Citizen"]*16)
     labels_text = ListProperty(["Capteur"]*16)
-    titre_text = StringProperty("Texte")
+    owner_titre = StringProperty("")
+    owner_detail = StringProperty("")
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -90,6 +100,24 @@ class ScreenManager(ScreenManager):
 
 
 class SmartCitizen(BoxLayout):
+    """
+    Utilisation de SmartCitizenRequests
+    url = "http://api.smartcitizen.me/v0/devices/"
+    device_nbr = 9525
+    scr = SmartCitizenRequests(url, device_nbr)
+    resp = scr.get_resp_dict(scr.instant_url)
+
+    id_ = 55
+    rollup = 4
+    from_ = "2020-01-01"
+    to_ = "2020-01-15"
+    histo_url = scr.get_histo_url(id_, rollup, from_, to_)
+    resp = scr.get_resp_dict(histo_url)
+    histo = scr.get_histo(resp)
+    [   ['2020-01-14T20:00:35Z', 18.709495798319324],
+        ['2020-01-14T16:00:32Z', 18.996260504201675],
+        .....
+    """
 
     def __init__(self, app, **kwargs):
         super().__init__(**kwargs)
@@ -97,36 +125,86 @@ class SmartCitizen(BoxLayout):
         # Permet d'appeler les attributs de app créé dans SmartCitizenApp
         self.app = app
 
-        self.url = "http://api.smartcitizen.me/v0/"
-        self.device = "devices"
-        self.device_nbr = self.app.config.get('kit', 'kit')
-        print("Kit:", self.device_nbr)
-        self.data = None
-        self.owner = None
+        self.url = self.app.config.get('url', 'url')
+        self.device_nbr = self.app.config.get('url', 'kit')
 
         # premier appel au lancement
-        self.get_data()
-        self.apply_data()
-        self.apply_owner()
+        Clock.schedule_once(self.update)
+
 
         # Appel tous les 10 secondes
-        self.event = Clock.schedule_interval(self.update, 10)
+        Clock.schedule_interval(self.update, 10)
+
+    def get_request_url(self):
+        """url ne doit pas se terminer par /
+        device est devices ou kits, pas de /
+        device_nbr entre 0 et 100000, int
+        A combiner avec la saisie des options !
+        """
+        # TODO pas utilisé, à faire
+        if "http://api.smartcitizen.me" not in self.url:
+            self.url = None
+
+        if self.url:
+            if self.url[-1] == "/":
+                self.url = self.url[:-1]
+
+        if "/" in self.device:
+            self.device.replace("/", "")
+        if self.device not in ["devices", "kits"]:
+            self.device = None
+
+        self.device_nbr = int(self.device_nbr)
+        if self.device_nbr < 0: self.device_nbr= None
+        if self.device_nbr > 20000: self.device_nbr= None
+
+        if self.url and self.device and self.device_nbr:
+            request_url = self.url + "/"\
+                          + self.device + "/"\
+                          + str(self.device_nbr)
+        else:
+            request_url = None
+
+        print("Adresse des requêtes: {}".format(request_url))
+
+        return request_url
 
     def update(self, dt):
-        self.get_data()
-        self.apply_data()
-        self.apply_owner()
+        self.get_and_apply_instant_values()
 
-    def get_data(self):
-        self.device_nbr = self.app.device_nbr
-        print(self.device_nbr)
-        scr = SmartCitizenRequests(self.url, self.device, self.device_nbr)
-        scr.get_one_request()
-        scr.get_data()
-        self.data = scr.data
-        self.owner = scr.owner
+    def get_and_apply_instant_values(self):
+        """
+        owner
+        ('la labomedia', 'https://labomedia.org', 'Orléans', 'France')
 
-    def apply_data(self):
+        sensors
+        description                      unit   value   id
+        ['Digital Ambient Light Sensor', 'Lux', 31.79, 14],
+        ['Custom Circuit', '%', -1.0, 10],
+        ....
+
+        kit
+        'Smart Citizen Kit 2.1 with Urban Sensor Board'
+
+        data
+         exposure    alt   latitude           longitude
+        ('outdoor', None, 47.9006640998651, 1.91683530807495)
+        """
+
+        scr = SmartCitizenRequests(self.url, self.device_nbr)
+        resp = scr.get_resp_dict(scr.instant_url)
+
+        # Détail du owner
+        owner = scr.get_owner(resp)
+        kit = scr.get_kit(resp)
+        data = scr.get_data(resp)
+        self.apply_owner(owner, kit, data)
+
+        # Les valeurs de tous les capteurs
+        sensors = scr.get_sensors(resp)
+        self.apply_sensors(sensors)
+
+    def apply_sensors(self, sensors):
 
         first_screen = self.ids.sm.get_screen("first")
 
@@ -135,20 +213,47 @@ class SmartCitizen(BoxLayout):
         first_screen.labels_text = [""]*16
 
         # Ecrasement par nouvelles valeurs
-        x = min(len(self.data), 16)
-        for d in range(x):
-            description = textwrap.fill(self.data[d][0], 30)
-            first_screen.btns_text[d] = description
-            first_screen.labels_text[d] = str(self.data[d][2]) + " "\
-                                          + self.data[d][1]
+        if sensors:
+            x = min(len(sensors), 16)
+            for d in range(x):
+                description = textwrap.fill(sensors[d][0], 30)
+                first_screen.btns_text[d] = description
+                first_screen.labels_text[d] = str(round(sensors[d][2], 2))\
+                                              + " "\
+                                              + sensors[d][1]
 
-    def apply_owner(self):
+    def apply_owner(self, owner, kit, data):
 
         first_screen = self.ids.sm.get_screen("first")
-        if self.owner[0] and self.owner[1]:
-            first_screen.titre_text = self.owner[0] + "\n" + self.owner[1]
+
+        # Reset
+        first_screen.owner_titre = ""
+
+        if owner[0]:
+            first_screen.owner_titre = owner[0]
         else:
-            first_screen.titre_text = "Kit inexistant"
+            first_screen.owner_titre = "Owner inconnu"
+
+        if owner[1]:
+            first_screen.owner_titre += "\n" + owner[1]
+
+        # Reset
+        first_screen.owner_detail = ""
+
+        if kit:
+            first_screen.owner_detail = kit
+
+        if data:
+            if data[0] == None: data[0] = ""
+            if data[1] == None: data[1] = ""
+            if data[2] == None: data[2] = ""
+            if data[3] == None: data[3] = ""
+
+            # exposure  alt  latitude  longitude
+            first_screen.owner_detail += "Exposition" + str(data[0]) +\
+                                         "Altitude" + str(data[1]) +\
+                                         "Latitude" + str(data[2]) +\
+                                         "Longitude" + str(data[3])
 
 
 class SmartCitizenApp(App):
