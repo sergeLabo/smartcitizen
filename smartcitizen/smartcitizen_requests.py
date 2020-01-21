@@ -64,7 +64,7 @@ class SmartCitizenRequests:
         or_id=55&rollup=4h&from=2020-01-01&to=2020-01-15
         """
 
-        histo_url = url + str(device_nbr)\
+        histo_url = self.url + str(self.device_nbr)\
                     + '/readings?sensor_id=' + str(id_)\
                     + '&rollup=' + str(rollup) + 'h&from='\
                     + from_ + '&to=' + to_
@@ -239,6 +239,7 @@ if __name__ == '__main__':
 
     resp = scr.get_resp_dict(scr.instant_url)
 
+    # instant
     owner = scr.get_owner(resp)
     print("owner")
     pp.pprint(owner)
@@ -252,15 +253,17 @@ if __name__ == '__main__':
     print("data")
     pp.pprint(data)
 
-    id_ = 55
+    # histo
+    id_ = 113
     rollup = 4
     from_ = "2020-01-01"
     to_ = "2020-01-15"
     histo_url = scr.get_histo_url(id_, rollup, from_, to_)
     resp = scr.get_resp_dict(histo_url)
     h = scr.get_histo(resp)
-    print("h")
-    pp.pprint(h)
+    print("h", h)
+    print(len(h))
+    # #pp.pprint(h)
 
 # Réponse du script
 """

@@ -5,7 +5,6 @@
     ActionBar:
         pos_hint: {"top": 1}
         icon: self.icon
-
         ActionView:
             use_separator: False
             ActionPrevious:
@@ -36,7 +35,6 @@
                 ActionButton:
                     text: 'Quitter'
                     on_release: app.do_quit()
-
     ScreenManager:
         id: sm
         MainScreen:
@@ -71,22 +69,35 @@
         BoxLayout:
             size_hint_y: 0.10
 
-<Screen1>:
-    name: 'first'
-    blanche: blanche
+<OwnerInfo>:
+    size_hint: .7, .4
+    title: "Information"
     BoxLayout:
         orientation: 'vertical'
+        padding: 10
+        spacing: 20
         Label:
-            canvas.before:
-                Color:
-                    rgba: 1, 1, 1, 1
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            size_hint_y: 0.85
+            text_size: 300, None
+            line_height: 1.5
+            text: app.root.ids.sm.get_screen("first").owner_detail
+        Button:
+            text: 'OK'
+            size_hint_y: 0.15
+            on_press: root.dismiss()
+
+<Screen1>:
+    name: 'first'
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            background_normal: ''
+            background_color: 0.1, 0.1, 0, 1
             size_hint_y: 0.10
             markup: True
             text: '[b]' + root.owner_titre + '[/b]'
             color: 1, 0, 0.5, 1
+            on_release: root.display_info()
         BoxLayout:
             size_hint_y: 0.90
             orientation: 'vertical'
@@ -110,6 +121,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[0]
+                            on_release: root.curve_display(0)
                         Label:
                             canvas.before:
                                 Color:
@@ -130,6 +142,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[1]
+
                         Label:
                             canvas.before:
                                 Color:
@@ -426,44 +439,32 @@
                             halign: 'center'
                             valign: 'middle'
 
-<MyGraph>:
-    BoxLayout:
-        size_hint_y: 1.0
-        Graph:
-            background_color: 0, 1, 1, 1
-            border_color: 1, 1, 0, 1
-            xlabel: 'X'
-            ylabel: 'Y'
-            x_ticks_minor: 5
-            x_ticks_major: 25
-            y_ticks_major: 1
-            y_grid_label: True
-            x_grid_label: True
-            padding: 5
-            x_grid: True
-            y_grid: True
-            xmin:0
-            xmax:100
-            ymin:-1
-            ymax:1
+<MyGraph>:  # Non utilisé, impossible d'ajouter la courbe
+    Graph:
+        size: root.size
+        background_color: 0.8, 0.8, 0.8, 1
+        border_color: 0, 0.1, 0.1, 1
+        xlabel: 'Date/Heure'
+        ylabel: 'Valeur du capteur'
+        x_ticks_minor: 5
+        x_ticks_major: 25
+        y_ticks_major: 1
+        y_grid_label: True
+        x_grid_label: True
+        padding: 5
+        x_grid: True
+        y_grid: True
+        xmin: 0
+        xmax: 100
+        ymin: -1
+        ymax: 1
+        tick_color: (1, 0, 0, 1)
+        label_options: {'color': (0.5, 0.5, 0, 1)}
 
 <Screen2>:
     name: 'second'
     BoxLayout:
-        orientation: 'vertical'
-        size_hint_y: 0.90
-
-        MyGraph:
-            id: graph
-
-        BoxLayout: # 2 button en bas
-            orientation: 'horizontal'
-            size_hint_y: 0.10
-            Button:
-                text: "Retour à l'accueil"
-                font_size: 30
-                on_release: app.root.ids.sm.current = 'main'
-            Button:
-                text: 'Retour aux capteurs'
-                font_size: 30
-                on_release: app.root.ids.sm.current = 'first'
+        # graph_id: graph_id  # utile avec MyGraph
+        id: graph_id
+        # #MyGraph: Impossible d'ajouter la courbe
+            # #id: graph_id

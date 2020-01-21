@@ -41,54 +41,173 @@ from math import sin
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import StringProperty, ObjectProperty
-from kivy.properties import ListProperty, NumericProperty
+from kivy.properties import StringProperty, ObjectProperty, ListProperty
 from kivy.clock import Clock
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy_garden.graph import Graph, MeshLinePlot
+from kivy.uix.popup import Popup
 
 from smartcitizen_requests import SmartCitizenRequests
 
-class MyGraph(Widget):
 
+class MyGraph(Graph):
+    """Documentation de kivy_garden.graph à
+    https://kivy-garden.github.io/graph/flower.html
+
+    Impossible d'ajouter la courbe à graph:
+        d'où création de graph dans ce script.
+    class non utilisée.
+    """
     pass
 
 
 class Screen2(Screen):
 
-    graph = ObjectProperty()
+    graph_id = ObjectProperty()
+    histo = ListProperty([0, 0]*101)
 
     def __init__(self, **kwargs):
+        """self.graph ne peut pas être initié ici, il doit être dans une autre
+        méthode.
+        """
+
         super().__init__(**kwargs)
 
-        print([type(widget) for widget in self.walk(loopback=True)])
+        # pour l'exemple
+        # #self.tic = 0
 
-        plot = MeshLinePlot(color=[1, 0, 0, 1])
-        plot.points = [(x, sin(x / 10.)) for x in range(0, 101)]
-        # #self.ids.graph.add_plot(plot)
+        self.sensor_id = 0
+
+        # Pour initier le graph
+        # Pour l'exemple
+        # #Clock.schedule_once(self.graph_init_example)
+        Clock.schedule_once(self.graph_init)
+
+    def graph_init(self, dt):
+        """Tous les arguments de graph sont dans un dict.
+        plot doit avoir 100 couples [(x, y), ...]
+        """
+
+        self.graph = Graph( background_color=(0.8, 0.8, 0.8, 1),
+                            border_color=(0, 0.1, 0.1, 1),
+                            xlabel='Date/Heure',
+                            ylabel='Valeur du capteur',
+                            x_ticks_minor=5,
+                            x_ticks_major=25,
+                            y_ticks_major=1,
+                            x_grid_label=True,
+                            y_grid_label=True,
+                            padding=5,
+                            x_grid=True,
+                            y_grid=True,
+                            xmin=0,
+                            xmax=100,
+                            ymin=0,
+                            ymax=1,
+                            tick_color=(1, 0, 0, 1),
+                            label_options={'color': (0.5, 0.5, 0, 1)})
+
+        # Construction de la courbe
+        # Initialisation de la courbe avec sa couleur
+        self.plot = MeshLinePlot(color=[0, 0, 0, 1])
+        self.plot.points = []
+        # 100 intervals, 101 valeurs
+        for i in range(101):
+            a = i/100
+            self.plot.points.append([i, a])
+
+        self.graph.add_plot(self.plot)
+
+        self.ids.graph_id.add_widget(self.graph)
+
+        # Actualisation de la courbe
+        Clock.schedule_interval(self.update, 10)
+
+    def update(self, dt):
+        self.plot.points = []
+        for i in range(len(self.histo)):
+            y = self.histo[i][1]/300
+            if i < 10:
+                print([i, y])
+            self.plot.points.append([i, y])
+
+    def update_example(self, dt):
+        self.tic += 1
+        self.plot.points = [(x, sin((x + self.tic)/ 10.)) for x in range(0, 101)]
+
+    def graph_init_example(self, dt):
+        """self.ids.graph_id n'existe pas encore dans __init__()
+        Il n'est accessible que dans une autre fonction appelée
+        par Clock.schedule_once(). Pourquoi ?
+        """
+
+        self.graph = Graph( background_color = (0.8, 0.8, 0.8, 1),
+                            border_color = (0, 0.1, 0.1, 1),
+                            xlabel = 'Date/Heure',
+                            ylabel = 'Valeur du capteur',
+                            x_ticks_minor = 5,
+                            x_ticks_major = 25,
+                            y_ticks_major = 1,
+                            x_grid_label = True,
+                            y_grid_label = True,
+                            padding = 5,
+                            x_grid = True,
+                            y_grid = True,
+                            xmin = 0,
+                            xmax = 100,
+                            ymin = -1,
+                            ymax = 1,
+                            tick_color = (1, 0, 0, 1),
+                            label_options = {'color': (0.5, 0.5, 0, 1)})
+
+        self.plot = MeshLinePlot(color=[1, 0, 0, 1])
+        # 100 intervals, 101 valeurs
+        self.plot.points = [(x, sin(x / 10.)) for x in range(0, 101)]
+        self.graph.add_plot(self.plot)
+
+        self.ids.graph_id.add_widget(self.graph)
+
+        # Actualisation de la courbe
+        Clock.schedule_interval(self.update_example, 0.1)
+
+    def update_example(self, dt):
+        self.tic += 1
+        self.plot.points = [(x, sin((x + self.tic)/ 10.)) for x in range(0, 101)]
+
+
+class OwnerInfo(Popup):
+    pass
 
 
 class Screen1(Screen):
-    blanche = ObjectProperty(None)
+
     btns_text = ListProperty(["Smart Citizen"]*16)
     labels_text = ListProperty(["Capteur"]*16)
     owner_titre = StringProperty("")
     owner_detail = StringProperty("")
 
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def on_button_state(self, instance, value):
-        """Call if button state change."""
+        # Liste des id chez SmartCitizen
+        self.sensor_id_list = [0]*16
 
-        print(instance, value, instance.index)
-        index = instance.index
-        if value == 'down':
-            value = int(index)
-        else:
-            value = 0
+    def display_info(self):
+        print("owner_detail\n", self.owner_detail)
+        popup = OwnerInfo()
+        popup.open()
+
+    def curve_display(self, index):
+        """index est le l'indice du capteur dans la liste"""
+
+        # Le id dont il nous faut l'histo
+        sensor_id = self.sensor_id_list[index]
+        print("sensor_id", sensor_id)
+
+        # Bascule sur écran 2
+        self.manager.get_screen("second").sensor_id = sensor_id
+        self.manager.current = "second"
 
 
 class MainScreen(Screen):
@@ -131,9 +250,17 @@ class SmartCitizen(BoxLayout):
         # premier appel au lancement
         Clock.schedule_once(self.update)
 
-
         # Appel tous les 10 secondes
         Clock.schedule_interval(self.update, 10)
+
+    # #def set_activ(self):
+        # #"""
+        # #"""
+
+        # #if self.ids.sm.current == 'second':
+            # #second_screen = self.ids.sm.get_screen("second")
+            # #second_screen.activ = 1
+            # #print("second_screen.activ", second_screen.activ)
 
     def get_request_url(self):
         """url ne doit pas se terminer par /
@@ -171,6 +298,10 @@ class SmartCitizen(BoxLayout):
 
     def update(self, dt):
         self.get_and_apply_instant_values()
+        second_screen = self.ids.sm.get_screen("second")
+        sensor_id = second_screen.sensor_id
+        if sensor_id:
+            self.get_histo(sensor_id)
 
     def get_and_apply_instant_values(self):
         """
@@ -205,6 +336,7 @@ class SmartCitizen(BoxLayout):
         self.apply_sensors(sensors)
 
     def apply_sensors(self, sensors):
+        """Maj de la liste des capteurs avec unit et value"""
 
         first_screen = self.ids.sm.get_screen("first")
 
@@ -221,8 +353,11 @@ class SmartCitizen(BoxLayout):
                 first_screen.labels_text[d] = str(round(sensors[d][2], 2))\
                                               + " "\
                                               + sensors[d][1]
+                # sensors[d][1] est le id chez smartcitizen
+                first_screen.sensor_id_list[d] = sensors[d][3]
 
     def apply_owner(self, owner, kit, data):
+        """Maj du str des infos du owner"""
 
         first_screen = self.ids.sm.get_screen("first")
 
@@ -240,8 +375,9 @@ class SmartCitizen(BoxLayout):
         # Reset
         first_screen.owner_detail = ""
 
+        # Report à first_screen pour affichage dans un popup
         if kit:
-            first_screen.owner_detail = kit
+            first_screen.owner_detail = kit + "\n\n"
 
         if data:
             if data[0] == None: data[0] = ""
@@ -250,28 +386,56 @@ class SmartCitizen(BoxLayout):
             if data[3] == None: data[3] = ""
 
             # exposure  alt  latitude  longitude
-            first_screen.owner_detail += "Exposition" + str(data[0]) +\
-                                         "Altitude" + str(data[1]) +\
-                                         "Latitude" + str(data[2]) +\
-                                         "Longitude" + str(data[3])
+            first_screen.owner_detail += "Exposition: " + str(data[0]) + "\n" +\
+                                         "Altitude: " + str(data[1]) + "\n" +\
+                                         "Latitude: " + str(data[2]) + "\n" +\
+                                         "Longitude: " + str(data[3])
+
+    def get_histo(self, sensor_id):
+        """Le sensor id est donné par le clic sur le button du capteur.
+        rollup, from_, to_ sont définis dans les options de smartcitizen.
+        """
+
+        rollup = self.app.config.get('histo', 'rollup')
+        from_ = self.app.config.get('histo', 'from_')
+        to_ = self.app.config.get('histo', 'to_')
+
+        scr = SmartCitizenRequests(self.url, self.device_nbr)
+        histo_url = scr.get_histo_url(sensor_id, rollup, from_, to_)
+        print(histo_url)
+
+        resp = scr.get_resp_dict(histo_url)
+
+        histo = scr.get_histo(resp)
+        print("SmartCitizen", sensor_id)
+        if histo:
+            self.set_histo(histo)
+
+    def set_histo(self, histo):
+        second_screen = self.ids.sm.get_screen("second")
+        second_screen.histo = histo
 
 
 class SmartCitizenApp(App):
 
     def build(self):
-        self.device_nbr = self.config.get('kit', 'kit')
+        self.device_nbr = self.config.get('url', 'kit')
         return SmartCitizen(self)
 
-    def on_start(self):
-        pass
-
     def build_config(self, config):
-        config.setdefaults("font", {"font_size": 20, "unit": "sp" })
+        config.setdefaults("font", {"font_size": 20})
 
-        config.setdefaults("kit", {"kit": 9525 })
+        config.setdefaults("histo", {"rollup": 4,
+                                     "from_": "2020-01-01",
+                                     "to_": "2020-01-15"})
+
+        config.setdefaults("url",
+                          {"url": "http://api.smartcitizen.me/v0/devices/",
+                           "kit": 9525})
 
     def build_settings(self, settings):
-        data = '''[ { "type": "title", "title":"Taille des textes"},
+        data = '''[ { "type": "title",
+                      "title":"Textes"},
 
                     { "type": "numeric",
                       "title": "Taille des textes",
@@ -279,14 +443,43 @@ class SmartCitizenApp(App):
                       "section": "font",
                       "key": "font_size"},
 
+                    { "type": "title",
+                      "title":"Adresse Web"},
+
+                    { "type": "numeric",
+                      "title": "Url sans le numéro du kit",
+                      "desc": "http: ...",
+                      "section": "url",
+                      "key": "url"},
+
                     { "type": "numeric",
                       "title": "Numéro du kit",
                       "desc": "0 à 20 000",
-                      "section": "kit",
-                      "key": "kit"}
+                      "section": "url",
+                      "key": "kit"},
+
+                    { "type": "numeric",
+                      "title": "Nombre d'heures",
+                      "desc": "entre 2 valeurs: 4 à 24 heures",
+                      "section": "histo",
+                      "key": "rollup"},
+
+                    { "type": "numeric",
+                      "title": "Depuis",
+                      "desc": "Date de début",
+                      "section": "histo",
+                      "key": "from_"},
+
+                    { "type": "numeric",
+                      "title": "Jusqu'à",
+                      "desc": "Date de fin",
+                      "section": "histo",
+                      "key": "to_"}
                       ]'''
 
-        settings.add_json_panel('Configuration de SmartCitizen', self.config, data=data)
+        settings.add_json_panel('Configuration de SmartCitizen',
+                                 self.config,
+                                 data=data)
 
     def on_config_change(self, config, section, key, value):
 
@@ -305,6 +498,11 @@ class SmartCitizenApp(App):
 
     def do_quit(self):
         SmartCitizenApp.get_running_app().stop()
+
+
+def dir_detail(objet):
+    for index in dir(objet):
+        print(index)
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ old/
 bin/
 version.txt
 sof/
+recherche/
 
 # non exclus
 !buildozer.spec
