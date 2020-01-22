@@ -27,9 +27,6 @@
                     text: 'Options'
                     on_release: app.open_settings()
                 ActionButton:
-                    text: 'Historique'
-                    on_release: app.root.ids.sm.current = "second"
-                ActionButton:
                     text: "Accueil"
                     on_release: app.root.ids.sm.current = "main"
                 ActionButton:
@@ -121,7 +118,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[0]
-                            on_release: root.curve_display(0)
+                            on_release: root.apply_go_to_screen2(0)
                         Label:
                             canvas.before:
                                 Color:
@@ -142,7 +139,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[1]
-
+                            on_release: root.apply_go_to_screen2(1)
                         Label:
                             canvas.before:
                                 Color:
@@ -163,6 +160,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[2]
+                            on_release: root.apply_go_to_screen2(2)
                         Label:
                             canvas.before:
                                 Color:
@@ -183,6 +181,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[3]
+                            on_release: root.apply_go_to_screen2(3)
                         Label:
                             canvas.before:
                                 Color:
@@ -203,6 +202,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[4]
+                            on_release: root.apply_go_to_screen2(4)
                         Label:
                             canvas.before:
                                 Color:
@@ -223,6 +223,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[5]
+                            on_release: root.apply_go_to_screen2(5)
                         Label:
                             canvas.before:
                                 Color:
@@ -243,6 +244,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[6]
+                            on_release: root.apply_go_to_screen2(6)
                         Label:
                             canvas.before:
                                 Color:
@@ -263,6 +265,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[7]
+                            on_release: root.apply_go_to_screen2(7)
                         Label:
                             canvas.before:
                                 Color:
@@ -283,6 +286,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[8]
+                            on_release: root.apply_go_to_screen2(8)
                         Label:
                             canvas.before:
                                 Color:
@@ -303,6 +307,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[9]
+                            on_release: root.apply_go_to_screen2(9)
                         Label:
                             canvas.before:
                                 Color:
@@ -323,6 +328,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[10]
+                            on_release: root.apply_go_to_screen2(10)
                         Label:
                             canvas.before:
                                 Color:
@@ -343,6 +349,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[11]
+                            on_release: root.apply_go_to_screen2(11)
                         Label:
                             canvas.before:
                                 Color:
@@ -363,6 +370,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[12]
+                            on_release: root.apply_go_to_screen2(12)
                         Label:
                             canvas.before:
                                 Color:
@@ -383,6 +391,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[13]
+                            on_release: root.apply_go_to_screen2(13)
                         Label:
                             canvas.before:
                                 Color:
@@ -403,6 +412,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[14]
+                            on_release: root.apply_go_to_screen2(14)
                         Label:
                             canvas.before:
                                 Color:
@@ -423,6 +433,7 @@
                         Button:
                             size_hint_x: 0.60
                             text: root.btns_text[15]
+                            on_release: root.apply_go_to_screen2(15)
                         Label:
                             canvas.before:
                                 Color:
@@ -464,7 +475,14 @@
 <Screen2>:
     name: 'second'
     BoxLayout:
-        # graph_id: graph_id  # utile avec MyGraph
-        id: graph_id
-        # #MyGraph: Impossible d'ajouter la courbe
-            # #id: graph_id
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.1
+            Label:
+                text: root.titre
+        BoxLayout:
+            size_hint_y: 0.90
+            # graph_id: graph_id  # utile avec MyGraph
+            id: graph_id
+            # #MyGraph: Impossible d'ajouter la courbe
+                # #id: graph_id

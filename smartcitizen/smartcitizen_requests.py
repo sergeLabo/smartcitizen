@@ -47,7 +47,7 @@ class SmartCitizenRequests:
         """
 
         instant_url = self.url + str(self.device_nbr)
-        print("Adresse des requêtes: {}".format(instant_url))
+        # #print("Adresse des requêtes: {}".format(instant_url))
 
         return instant_url
 

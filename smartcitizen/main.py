@@ -36,7 +36,8 @@ if sys.platform == 'linux':
     Window.size = WS
 
 import textwrap
-from math import sin
+import datetime
+# #from time import sleep
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -65,115 +66,123 @@ class MyGraph(Graph):
 class Screen2(Screen):
 
     graph_id = ObjectProperty()
-    histo = ListProperty([0, 0]*101)
+    titre = StringProperty("Capteur")
 
     def __init__(self, **kwargs):
         """self.graph ne peut pas être initié ici, il doit être dans une autre
         méthode.
+        # Pour initier le graph
+        # #Clock.schedule_once(self.graph_init)
         """
 
         super().__init__(**kwargs)
 
-        # pour l'exemple
-        # #self.tic = 0
+        self.sensor_id = None
+        self.unit = ""
+        self.graph = None
+        self.histo = []
+        self.histo_data = (1, "2020-01-15", "2020-01-20")
+        self.y_major = 1
+        self.titre = "Capteur"
 
-        self.sensor_id = 0
-
-        # Pour initier le graph
-        # Pour l'exemple
-        # #Clock.schedule_once(self.graph_init_example)
-        Clock.schedule_once(self.graph_init)
-
-    def graph_init(self, dt):
-        """Tous les arguments de graph sont dans un dict.
-        plot doit avoir 100 couples [(x, y), ...]
+    def graph_init(self):
+        """Initialisation de self.graph.
+        plot initié avec 100 couples [(x, y), ...]
         """
 
+        print("Initialisation du graph")
+
+        # Si existe je détruits
+        if self.graph:
+            self.ids.graph_id.remove_widget(self.graph)
+            print("self.graph détruit")
+
+        # Récup de data dans Screen1
+        first_screen = self.manager.get_screen("first")
+        # ['Digital Ambient Light Sensor', 'Lux', 31.79]
+        #   description                     unit  value
+        self.labels_text = first_screen.labels_text
+
+        self.create_graph()
+
+        # # Construction de la courbe
+        # Initialisation de la courbe avec sa couleur
+        self.plot = MeshLinePlot(color=[0, 0, 0, 1])
+        self.plot.points = [(0, 0)]*101
+
+        self.graph.add_plot(self.plot)
+
+        self.ids.graph_id.add_widget(self.graph)
+
+        # Actualisation de la courbe
+        Clock.schedule_interval(self.update, 2)
+
+    def create_graph(self):
+        """Création du graph"""
+
+        print("Appel de la création du graph ..")
+
+        # Paramètres du graph
+        self.xlabel = 'Date'
+        self.ylabel = "1 correspond à  " + str(self.y_major) + " " + self.unit
+        self.xmin = 0
+        self.xmax = 100
+        self.ymin = 0
+        self.ymax = 1
+        print("self.y_major", self.y_major)
+
+        # Je crée ou recrée
         self.graph = Graph( background_color=(0.8, 0.8, 0.8, 1),
                             border_color=(0, 0.1, 0.1, 1),
-                            xlabel='Date/Heure',
-                            ylabel='Valeur du capteur',
+                            xlabel=self.xlabel,
+                            ylabel=self.ylabel,
                             x_ticks_minor=5,
                             x_ticks_major=25,
-                            y_ticks_major=1,
+                            y_ticks_major=0.25,
                             x_grid_label=True,
                             y_grid_label=True,
                             padding=5,
                             x_grid=True,
                             y_grid=True,
-                            xmin=0,
-                            xmax=100,
-                            ymin=0,
-                            ymax=1,
+                            xmin=self.xmin,
+                            xmax=self.xmax,
+                            ymin=self.ymin,
+                            ymax=self.ymax,
                             tick_color=(1, 0, 0, 1),
                             label_options={'color': (0.5, 0.5, 0, 1)})
 
-        # Construction de la courbe
-        # Initialisation de la courbe avec sa couleur
-        self.plot = MeshLinePlot(color=[0, 0, 0, 1])
-        self.plot.points = []
-        # 100 intervals, 101 valeurs
-        for i in range(101):
-            a = i/100
-            self.plot.points.append([i, a])
-
-        self.graph.add_plot(self.plot)
-
-        self.ids.graph_id.add_widget(self.graph)
-
-        # Actualisation de la courbe
-        Clock.schedule_interval(self.update, 10)
-
     def update(self, dt):
+
         self.plot.points = []
+        self.get_y_major()
+
+        # Apply value to plot
         for i in range(len(self.histo)):
-            y = self.histo[i][1]/300
-            if i < 10:
-                print([i, y])
+            y = self.histo[i][1]/self.y_major
             self.plot.points.append([i, y])
 
-    def update_example(self, dt):
-        self.tic += 1
-        self.plot.points = [(x, sin((x + self.tic)/ 10.)) for x in range(0, 101)]
+    def get_y_major(self):
+        """Le maxi de l'echelle des y"""
 
-    def graph_init_example(self, dt):
-        """self.ids.graph_id n'existe pas encore dans __init__()
-        Il n'est accessible que dans une autre fonction appelée
-        par Clock.schedule_once(). Pourquoi ?
-        """
+        # Recherche du maxi
+        maxi = 0
+        for couple in self.histo:
+            if couple[1] > maxi:
+                maxi = couple[1]
 
-        self.graph = Graph( background_color = (0.8, 0.8, 0.8, 1),
-                            border_color = (0, 0.1, 0.1, 1),
-                            xlabel = 'Date/Heure',
-                            ylabel = 'Valeur du capteur',
-                            x_ticks_minor = 5,
-                            x_ticks_major = 25,
-                            y_ticks_major = 1,
-                            x_grid_label = True,
-                            y_grid_label = True,
-                            padding = 5,
-                            x_grid = True,
-                            y_grid = True,
-                            xmin = 0,
-                            xmax = 100,
-                            ymin = -1,
-                            ymax = 1,
-                            tick_color = (1, 0, 0, 1),
-                            label_options = {'color': (0.5, 0.5, 0, 1)})
-
-        self.plot = MeshLinePlot(color=[1, 0, 0, 1])
-        # 100 intervals, 101 valeurs
-        self.plot.points = [(x, sin(x / 10.)) for x in range(0, 101)]
-        self.graph.add_plot(self.plot)
-
-        self.ids.graph_id.add_widget(self.graph)
-
-        # Actualisation de la courbe
-        Clock.schedule_interval(self.update_example, 0.1)
-
-    def update_example(self, dt):
-        self.tic += 1
-        self.plot.points = [(x, sin((x + self.tic)/ 10.)) for x in range(0, 101)]
+        # Définition de l'échelle sur y soit 0 à self.y_major
+        if 1 < maxi < 10:
+            self.y_major = round(int(maxi), -0)
+        elif 10 <= maxi < 100:
+            self.y_major = round(int(maxi), -1)
+        elif 100 <= maxi < 1000:
+            self.y_major = round(int(maxi), -2)
+        elif 1000 <= maxi < 10000:
+            self.y_major = round(int(maxi), -3)
+        elif 10000 <= maxi < 100000:
+            self.y_major = round(int(maxi), -4)
+        else:
+            self.y_major = 1
 
 
 class OwnerInfo(Popup):
@@ -198,15 +207,23 @@ class Screen1(Screen):
         popup = OwnerInfo()
         popup.open()
 
-    def curve_display(self, index):
-        """index est le l'indice du capteur dans la liste"""
+    def apply_go_to_screen2(self, index):
+        """Appelé par le kv à l'action sur le button index
+        index est le l'indice du capteur dans la liste"""
 
         # Le id dont il nous faut l'histo
         sensor_id = self.sensor_id_list[index]
         print("sensor_id", sensor_id)
 
         # Bascule sur écran 2
-        self.manager.get_screen("second").sensor_id = sensor_id
+        second = self.manager.get_screen("second")
+        second.sensor_id = sensor_id
+        if len(self.labels_text[index].split(" ")) > 1:
+            second.unit = self.labels_text[index].split(" ")[1]
+        else:
+            second.unit = ""
+        second.titre = self.btns_text[index]
+        second.graph_init()
         self.manager.current = "second"
 
 
@@ -251,16 +268,7 @@ class SmartCitizen(BoxLayout):
         Clock.schedule_once(self.update)
 
         # Appel tous les 10 secondes
-        Clock.schedule_interval(self.update, 10)
-
-    # #def set_activ(self):
-        # #"""
-        # #"""
-
-        # #if self.ids.sm.current == 'second':
-            # #second_screen = self.ids.sm.get_screen("second")
-            # #second_screen.activ = 1
-            # #print("second_screen.activ", second_screen.activ)
+        Clock.schedule_interval(self.update, 2)
 
     def get_request_url(self):
         """url ne doit pas se terminer par /
@@ -322,17 +330,17 @@ class SmartCitizen(BoxLayout):
         ('outdoor', None, 47.9006640998651, 1.91683530807495)
         """
 
-        scr = SmartCitizenRequests(self.url, self.device_nbr)
-        resp = scr.get_resp_dict(scr.instant_url)
+        smart_req = SmartCitizenRequests(self.url, self.device_nbr)
+        resp = smart_req.get_resp_dict(smart_req.instant_url)
 
         # Détail du owner
-        owner = scr.get_owner(resp)
-        kit = scr.get_kit(resp)
-        data = scr.get_data(resp)
+        owner = smart_req.get_owner(resp)
+        kit = smart_req.get_kit(resp)
+        data = smart_req.get_data(resp)
         self.apply_owner(owner, kit, data)
 
         # Les valeurs de tous les capteurs
-        sensors = scr.get_sensors(resp)
+        sensors = smart_req.get_sensors(resp)
         self.apply_sensors(sensors)
 
     def apply_sensors(self, sensors):
@@ -400,26 +408,33 @@ class SmartCitizen(BoxLayout):
         from_ = self.app.config.get('histo', 'from_')
         to_ = self.app.config.get('histo', 'to_')
 
-        scr = SmartCitizenRequests(self.url, self.device_nbr)
-        histo_url = scr.get_histo_url(sensor_id, rollup, from_, to_)
-        print(histo_url)
+        smart_req = SmartCitizenRequests(self.url, self.device_nbr)
+        histo_url = smart_req.get_histo_url(sensor_id, rollup, from_, to_)
 
-        resp = scr.get_resp_dict(histo_url)
+        resp = smart_req.get_resp_dict(histo_url)
 
-        histo = scr.get_histo(resp)
-        print("SmartCitizen", sensor_id)
+        histo = smart_req.get_histo(resp)
+        self.set_histo(histo, rollup, from_, to_)
+
+    def set_histo(self, histo, rollup, from_, to_):
         if histo:
-            self.set_histo(histo)
-
-    def set_histo(self, histo):
-        second_screen = self.ids.sm.get_screen("second")
-        second_screen.histo = histo
+            if len(histo[0]) > 1:
+                second_screen = self.ids.sm.get_screen("second")
+                second_screen.histo = histo
+                second_screen.histo_data = (rollup, from_, to_)
+                print("Données de SmartCitizen pour le graph ok")
 
 
 class SmartCitizenApp(App):
 
     def build(self):
+
+        # SmartCitizen viendra chercher ces attributs
         self.device_nbr = self.config.get('url', 'kit')
+        self.rollup = self.config.get('histo', 'rollup')
+        self.from_ = self.config.get('histo', 'from_')
+        self.to_ = self.config.get('histo', 'to_')
+
         return SmartCitizen(self)
 
     def build_config(self, config):
@@ -446,7 +461,7 @@ class SmartCitizenApp(App):
                     { "type": "title",
                       "title":"Adresse Web"},
 
-                    { "type": "numeric",
+                    { "type": "string",
                       "title": "Url sans le numéro du kit",
                       "desc": "http: ...",
                       "section": "url",
@@ -458,19 +473,22 @@ class SmartCitizenApp(App):
                       "section": "url",
                       "key": "kit"},
 
+                    { "type": "title",
+                      "title":"Historique"},
+
                     { "type": "numeric",
                       "title": "Nombre d'heures",
-                      "desc": "entre 2 valeurs: 4 à 24 heures",
+                      "desc": "entre 2 valeurs: 1 à 24 heures",
                       "section": "histo",
                       "key": "rollup"},
 
-                    { "type": "numeric",
+                    { "type": "string",
                       "title": "Depuis",
                       "desc": "Date de début",
                       "section": "histo",
                       "key": "from_"},
 
-                    { "type": "numeric",
+                    { "type": "string",
                       "title": "Jusqu'à",
                       "desc": "Date de fin",
                       "section": "histo",
@@ -482,19 +500,68 @@ class SmartCitizenApp(App):
                                  data=data)
 
     def on_config_change(self, config, section, key, value):
+        """Si changement dans Options"""
 
         if config is self.config:  # du joli python rigoureux
             token = (section, key)
 
-            # Font size
+            # Kit number
             if token == ('kit', 'kit'):
                 value = int(value)
                 if value < 0: value = 0
                 if value > 20000: value = 20000
                 print("Nouveau kit:", value)
+                # Save in ini
                 self.config.set('kit', 'kit', value)
                 # SmartCitizen viendra chercher cet attribut de cette class
                 self.device_nbr = value
+
+            # Rollup
+            if token == ('histo', 'rollup'):
+                # Nombre d'heures entre chaque relevé, 1 à 24 heures
+                value = int(value)
+                if value < 1: value = 1
+                if value > 24: value = 24
+                # Save in ini
+                self.config.set('', '', value)
+
+            # from_ et to = 2020-01-10
+            if token == ('histo', 'from_'):
+                # Vérification de la cohérence de la date
+                try:
+                    d = value.split("-")
+                except:
+                    d = ["2020", "01", "01"]
+                try:
+                    # dt = objet datetime
+                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
+                except:
+                    d = ["2020", "01", "01"]
+                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
+                print("from_ datetime", dt)
+                # TODO imposer from < date actuelle
+                new_value = d[0] + "-" + d[1] + "-" + d[2]
+                # Save in ini
+                self.config.set('histo', 'from_', new_value)
+
+            if token == ('histo', 'to_'):
+                # Vérification de la cohérence de la date
+                try:
+                    d = value.split("-")
+                except:
+                    d = ["2020", "01", "01"]
+                try:
+                    # dt = objet datetime
+                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
+                except:
+                    d = ["2020", "01", "01"]
+                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
+                print("to_ datetime", dt)
+                # TODO imposer to > from
+                # TODO imposer from < date actuelle
+                new_value = d[0] + "-" + d[1] + "-" + d[2]
+                # Save in ini
+                self.config.set('histo', 'to_', new_value)
 
     def do_quit(self):
         SmartCitizenApp.get_running_app().stop()
