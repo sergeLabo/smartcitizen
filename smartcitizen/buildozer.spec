@@ -16,7 +16,7 @@ source.include_patterns = images/*.jpg,images/*.png
 version.regex = __version__ = ['"](.*)['"]
 version.filename = %(source.dir)s/main.py
 
-requirements = python3,kivy,requests
+requirements = python3,kivy,requests,kivy_garden.graph
 garden_requirements = graph
 
 orientation = all

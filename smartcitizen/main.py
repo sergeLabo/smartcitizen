@@ -21,23 +21,23 @@
 #######################################################################
 
 
-__version__ = '0.04'
+__version__ = '0.21'
+
 
 import kivy
 kivy.require('1.11.1')
 
-# Pour mon PC
+# Pour mon PC mais perturbe l'affichage sur android
 import sys
 if sys.platform == 'linux':
     from kivy.core.window import Window
     # Pour simuler l'écran de mon tél qui fait 1280*720
-    k = 0.8
+    k = 0.80
     WS = (int(720*k), int(1280*k))
     Window.size = WS
 
 import textwrap
 import datetime
-# #from time import sleep
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -52,27 +52,14 @@ from kivy.uix.popup import Popup
 from smartcitizen_requests import SmartCitizenRequests
 
 
-class MyGraph(Graph):
-    """Documentation de kivy_garden.graph à
-    https://kivy-garden.github.io/graph/flower.html
-
-    Impossible d'ajouter la courbe à graph:
-        d'où création de graph dans ce script.
-    class non utilisée.
-    """
-    pass
-
-
 class Screen2(Screen):
 
     graph_id = ObjectProperty()
     titre = StringProperty("Capteur")
 
     def __init__(self, **kwargs):
-        """self.graph ne peut pas être initié ici, il doit être dans une autre
-        méthode.
-        # Pour initier le graph
-        # #Clock.schedule_once(self.graph_init)
+        """self.graph ne peut pas être initié ici.
+        Il doit être dans une autre méthode et appelé plus tard.
         """
 
         super().__init__(**kwargs)
@@ -81,9 +68,17 @@ class Screen2(Screen):
         self.unit = ""
         self.graph = None
         self.histo = []
-        self.histo_data = (1, "2020-01-15", "2020-01-20")
+        self.histo_data = None
         self.y_major = 1
         self.titre = "Capteur"
+        self.period = None
+        self.abscissa = 100
+        self.reset = None
+
+    def get_datetime(self, date):
+        """de "2020-01-15", retourne datetime.date"""
+        d = date.split("-")
+        return datetime.date(int(d[0]), int(d[1]), int(d[2]))
 
     def graph_init(self):
         """Initialisation de self.graph.
@@ -98,10 +93,10 @@ class Screen2(Screen):
             print("self.graph détruit")
 
         # Récup de data dans Screen1
-        first_screen = self.manager.get_screen("first")
+        screen1 = self.manager.get_screen("screen1")
         # ['Digital Ambient Light Sensor', 'Lux', 31.79]
         #   description                     unit  value
-        self.labels_text = first_screen.labels_text
+        self.labels_text = screen1.labels_text
 
         self.create_graph()
 
@@ -114,19 +109,19 @@ class Screen2(Screen):
 
         self.ids.graph_id.add_widget(self.graph)
 
-        # Actualisation de la courbe
-        Clock.schedule_interval(self.update, 2)
+        # ## Actualisation de la courbe
+        # #Clock.schedule_interval(self.update, 2)
 
     def create_graph(self):
-        """Création du graph"""
+        """Création du graph seul et pas d'application au widget"""
 
         print("Appel de la création du graph ..")
 
         # Paramètres du graph
-        self.xlabel = 'Date'
+        self.xlabel = "Historique en heures"
         self.ylabel = "1 correspond à  " + str(self.y_major) + " " + self.unit
         self.xmin = 0
-        self.xmax = 100
+        self.xmax = self.abscissa
         self.ymin = 0
         self.ymax = 1
         print("self.y_major", self.y_major)
@@ -138,7 +133,7 @@ class Screen2(Screen):
                             ylabel=self.ylabel,
                             x_ticks_minor=5,
                             x_ticks_major=25,
-                            y_ticks_major=0.25,
+                            y_ticks_major=0.10,
                             x_grid_label=True,
                             y_grid_label=True,
                             padding=5,
@@ -149,15 +144,29 @@ class Screen2(Screen):
                             ymin=self.ymin,
                             ymax=self.ymax,
                             tick_color=(1, 0, 0, 1),
-                            label_options={'color': (0.5, 0.5, 0, 1)})
+                            label_options={'color': (0.2, 0.2, 0.2, 1)})
 
-    def update(self, dt):
+    def update(self):  # , dt):
+        """Update de cette class toutes les 2 secondes"""
 
+        if self.reset:
+            self.reset = None
+            self.graph_init()
+
+        # Reset des points
         self.plot.points = []
-        self.get_y_major()
+
+        # Echelle des y
+        y_major = self.get_y_major()
+        if y_major != self.y_major:
+            self.y_major = y_major
+            # reset du graph
+            self.graph_init()
 
         # Apply value to plot
-        for i in range(len(self.histo)):
+        self.abscissa = len(self.histo)
+        print(self.abscissa)
+        for i in range(self.abscissa):
             y = self.histo[i][1]/self.y_major
             self.plot.points.append([i, y])
 
@@ -170,19 +179,24 @@ class Screen2(Screen):
             if couple[1] > maxi:
                 maxi = couple[1]
 
-        # Définition de l'échelle sur y soit 0 à self.y_major
+        # Pour éviter que la courbe touche le maxi
+        maxi *= 1.1
+
+        # Définition de l'échelle sur y soit 0 à y_major
         if 1 < maxi < 10:
-            self.y_major = round(int(maxi), -0)
+            y_major = round(int(maxi), -0)
         elif 10 <= maxi < 100:
-            self.y_major = round(int(maxi), -1)
+            y_major = round(int(maxi), -1)
         elif 100 <= maxi < 1000:
-            self.y_major = round(int(maxi), -2)
+            y_major = round(int(maxi), -2)
         elif 1000 <= maxi < 10000:
-            self.y_major = round(int(maxi), -3)
+            y_major = round(int(maxi), -3)
         elif 10000 <= maxi < 100000:
-            self.y_major = round(int(maxi), -4)
+            y_major = round(int(maxi), -4)
         else:
-            self.y_major = 1
+            y_major = 1
+
+        return y_major
 
 
 class OwnerInfo(Popup):
@@ -216,19 +230,36 @@ class Screen1(Screen):
         print("sensor_id", sensor_id)
 
         # Bascule sur écran 2
-        second = self.manager.get_screen("second")
-        second.sensor_id = sensor_id
+        screen2 = self.manager.get_screen("screen2")
+        screen2.sensor_id = sensor_id
         if len(self.labels_text[index].split(" ")) > 1:
-            second.unit = self.labels_text[index].split(" ")[1]
+            screen2.unit = self.labels_text[index].split(" ")[1]
         else:
-            second.unit = ""
-        second.titre = self.btns_text[index]
-        second.graph_init()
-        self.manager.current = "second"
+            screen2.unit = ""
+        screen2.titre = self.btns_text[index]
+        screen2.graph_init()
+        self.manager.current = "screen2"
 
 
 class MainScreen(Screen):
-    pass
+
+    owner = StringProperty("")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Demande permanente du owner jusqu'à l'avoir
+        Clock.schedule_interval(self.get_owner, 1)
+
+    def get_owner(self, dt):
+        if not self.owner:
+            try:
+                screen1 = self.manager.get_screen("screen1")
+                toto = screen1.owner_titre.splitlines()[0]
+                self.owner = 'Suivi des capteurs de\n{}'.format(toto)
+            except:
+                self.owner = ""
+
+        return self.owner
 
 
 class ScreenManager(ScreenManager):
@@ -260,56 +291,26 @@ class SmartCitizen(BoxLayout):
 
         # Permet d'appeler les attributs de app créé dans SmartCitizenApp
         self.app = app
-
-        self.url = self.app.config.get('url', 'url')
-        self.device_nbr = self.app.config.get('url', 'kit')
+        self.count = 0
 
         # premier appel au lancement
         Clock.schedule_once(self.update)
 
-        # Appel tous les 10 secondes
+        # Appel tous les 2 secondes
         Clock.schedule_interval(self.update, 2)
-
-    def get_request_url(self):
-        """url ne doit pas se terminer par /
-        device est devices ou kits, pas de /
-        device_nbr entre 0 et 100000, int
-        A combiner avec la saisie des options !
-        """
-        # TODO pas utilisé, à faire
-        if "http://api.smartcitizen.me" not in self.url:
-            self.url = None
-
-        if self.url:
-            if self.url[-1] == "/":
-                self.url = self.url[:-1]
-
-        if "/" in self.device:
-            self.device.replace("/", "")
-        if self.device not in ["devices", "kits"]:
-            self.device = None
-
-        self.device_nbr = int(self.device_nbr)
-        if self.device_nbr < 0: self.device_nbr= None
-        if self.device_nbr > 20000: self.device_nbr= None
-
-        if self.url and self.device and self.device_nbr:
-            request_url = self.url + "/"\
-                          + self.device + "/"\
-                          + str(self.device_nbr)
-        else:
-            request_url = None
-
-        print("Adresse des requêtes: {}".format(request_url))
-
-        return request_url
 
     def update(self, dt):
         self.get_and_apply_instant_values()
-        second_screen = self.ids.sm.get_screen("second")
-        sensor_id = second_screen.sensor_id
+
+        # Report dans l'écran 2
+        screen2 = self.ids.sm.get_screen("screen2")
+
+        sensor_id = screen2.sensor_id
         if sensor_id:
             self.get_histo(sensor_id)
+        if self.app.reset:
+            screen2.reset = 1
+            self.app.reset = None
 
     def get_and_apply_instant_values(self):
         """
@@ -330,7 +331,7 @@ class SmartCitizen(BoxLayout):
         ('outdoor', None, 47.9006640998651, 1.91683530807495)
         """
 
-        smart_req = SmartCitizenRequests(self.url, self.device_nbr)
+        smart_req = SmartCitizenRequests(self.app.url, self.app.device_nbr)
         resp = smart_req.get_resp_dict(smart_req.instant_url)
 
         # Détail du owner
@@ -346,46 +347,55 @@ class SmartCitizen(BoxLayout):
     def apply_sensors(self, sensors):
         """Maj de la liste des capteurs avec unit et value"""
 
-        first_screen = self.ids.sm.get_screen("first")
+        # Pour bel affichage seulement
+        self.count += 1
+
+        screen1 = self.ids.sm.get_screen("screen1")
 
         # 2*16 Cases vides
-        first_screen.btns_text = [""]*16
-        first_screen.labels_text = [""]*16
+        screen1.btns_text = [""]*16
+        screen1.labels_text = [""]*16
 
         # Ecrasement par nouvelles valeurs
         if sensors:
             x = min(len(sensors), 16)
             for d in range(x):
                 description = textwrap.fill(sensors[d][0], 30)
-                first_screen.btns_text[d] = description
-                first_screen.labels_text[d] = str(round(sensors[d][2], 2))\
-                                              + " "\
-                                              + sensors[d][1]
-                # sensors[d][1] est le id chez smartcitizen
-                first_screen.sensor_id_list[d] = sensors[d][3]
+                screen1.btns_text[d] = description
+                t = str(round(sensors[d][2], 2))\
+                        + " "\
+                        + sensors[d][1]
+                screen1.labels_text[d] = t
+
+                # sensors[d][3] = id
+                screen1.sensor_id_list[d] = sensors[d][3]
+
+                a = "\nRequête n° {:<8}:\nCapteur: {:>30}    valeur: {}"
+                # #print(a.format(self.count, description, t))
+                pass
 
     def apply_owner(self, owner, kit, data):
         """Maj du str des infos du owner"""
 
-        first_screen = self.ids.sm.get_screen("first")
+        screen1 = self.ids.sm.get_screen("screen1")
 
         # Reset
-        first_screen.owner_titre = ""
+        screen1.owner_titre = ""
 
         if owner[0]:
-            first_screen.owner_titre = owner[0]
+            screen1.owner_titre = owner[0]
         else:
-            first_screen.owner_titre = "Owner inconnu"
+            screen1.owner_titre = "Owner inconnu"
 
         if owner[1]:
-            first_screen.owner_titre += "\n" + owner[1]
+            screen1.owner_titre += "\n" + owner[1]
 
         # Reset
-        first_screen.owner_detail = ""
+        screen1.owner_detail = ""
 
-        # Report à first_screen pour affichage dans un popup
+        # Report à screen1 pour affichage dans un popup
         if kit:
-            first_screen.owner_detail = kit + "\n\n"
+            screen1.owner_detail = kit + "\n\n"
 
         if data:
             if data[0] == None: data[0] = ""
@@ -394,7 +404,7 @@ class SmartCitizen(BoxLayout):
             if data[3] == None: data[3] = ""
 
             # exposure  alt  latitude  longitude
-            first_screen.owner_detail += "Exposition: " + str(data[0]) + "\n" +\
+            screen1.owner_detail += "Exposition: " + str(data[0]) + "\n" +\
                                          "Altitude: " + str(data[1]) + "\n" +\
                                          "Latitude: " + str(data[2]) + "\n" +\
                                          "Longitude: " + str(data[3])
@@ -404,25 +414,26 @@ class SmartCitizen(BoxLayout):
         rollup, from_, to_ sont définis dans les options de smartcitizen.
         """
 
-        rollup = self.app.config.get('histo', 'rollup')
-        from_ = self.app.config.get('histo', 'from_')
-        to_ = self.app.config.get('histo', 'to_')
+        smart_req = SmartCitizenRequests(self.app.url, self.app.device_nbr)
 
-        smart_req = SmartCitizenRequests(self.url, self.device_nbr)
-        histo_url = smart_req.get_histo_url(sensor_id, rollup, from_, to_)
-
+        histo_url = smart_req.get_histo_url(sensor_id,
+                                            self.app.rollup,
+                                            self.app.from_,
+                                            self.app.to_)
         resp = smart_req.get_resp_dict(histo_url)
 
         histo = smart_req.get_histo(resp)
-        self.set_histo(histo, rollup, from_, to_)
+        self.set_histo(histo)
 
-    def set_histo(self, histo, rollup, from_, to_):
+    def set_histo(self, histo):
         if histo:
             if len(histo[0]) > 1:
-                second_screen = self.ids.sm.get_screen("second")
-                second_screen.histo = histo
-                second_screen.histo_data = (rollup, from_, to_)
-                print("Données de SmartCitizen pour le graph ok")
+                # Repord dans l'écran 2
+                screen2 = self.ids.sm.get_screen("screen2")
+                screen2.histo = histo
+                screen2.update()
+                screen2.histo_data = (self.app.rollup, self.app.from_,
+                                            self.app.to_)
 
 
 class SmartCitizenApp(App):
@@ -431,18 +442,20 @@ class SmartCitizenApp(App):
 
         # SmartCitizen viendra chercher ces attributs
         self.device_nbr = self.config.get('url', 'kit')
-        self.rollup = self.config.get('histo', 'rollup')
-        self.from_ = self.config.get('histo', 'from_')
-        self.to_ = self.config.get('histo', 'to_')
+        self.rollup = self.get_rollup()
+        self.from_ , self.to_ = self.get_from_to()
+        print("Historique depuis", self.from_ , "jusqu'à", self.to_)
+
+        self.reset = None
+        self.url = self.config.get('url', 'url')
 
         return SmartCitizen(self)
 
     def build_config(self, config):
-        config.setdefaults("font", {"font_size": 20})
 
-        config.setdefaults("histo", {"rollup": 4,
-                                     "from_": "2020-01-01",
-                                     "to_": "2020-01-15"})
+        config.setdefaults("histo",
+                          {"rollup": "6m",
+                           "histo": "jour"})
 
         config.setdefaults("url",
                           {"url": "http://api.smartcitizen.me/v0/devices/",
@@ -450,16 +463,7 @@ class SmartCitizenApp(App):
 
     def build_settings(self, settings):
         data = '''[ { "type": "title",
-                      "title":"Textes"},
-
-                    { "type": "numeric",
-                      "title": "Taille des textes",
-                      "desc": "De 10 à 40",
-                      "section": "font",
-                      "key": "font_size"},
-
-                    { "type": "title",
-                      "title":"Adresse Web"},
+                      "title": "Adresse Web"},
 
                     { "type": "string",
                       "title": "Url sans le numéro du kit",
@@ -469,31 +473,20 @@ class SmartCitizenApp(App):
 
                     { "type": "numeric",
                       "title": "Numéro du kit",
-                      "desc": "0 à 20 000",
+                      "desc": "0 à 99 999",
                       "section": "url",
                       "key": "kit"},
 
                     { "type": "title",
-                      "title":"Historique"},
-
-                    { "type": "numeric",
-                      "title": "Nombre d'heures",
-                      "desc": "entre 2 valeurs: 1 à 24 heures",
-                      "section": "histo",
-                      "key": "rollup"},
+                      "title": "Historique"},
 
                     { "type": "string",
-                      "title": "Depuis",
-                      "desc": "Date de début",
+                      "title": "Période",
+                      "desc": "Jour ou semaine",
                       "section": "histo",
-                      "key": "from_"},
-
-                    { "type": "string",
-                      "title": "Jusqu'à",
-                      "desc": "Date de fin",
-                      "section": "histo",
-                      "key": "to_"}
-                      ]'''
+                      "key": "histo"}
+                    ]
+                '''
 
         settings.add_json_panel('Configuration de SmartCitizen',
                                  self.config,
@@ -505,63 +498,83 @@ class SmartCitizenApp(App):
         if config is self.config:  # du joli python rigoureux
             token = (section, key)
 
+            # url
+            if token == ('url', 'url'):
+                url = check_request_url(value)
+                print("Nouvelle url:", url)
+                # Save in ini
+                self.config.set('url', 'url', url)
+                # SmartCitizen viendra chercher cet attribut de cette class
+                self.url = url
+
             # Kit number
-            if token == ('kit', 'kit'):
+            if token == ('url', 'kit'):
                 value = int(value)
                 if value < 0: value = 0
                 if value > 20000: value = 20000
                 print("Nouveau kit:", value)
                 # Save in ini
-                self.config.set('kit', 'kit', value)
+                self.config.set('url', 'kit', value)
                 # SmartCitizen viendra chercher cet attribut de cette class
                 self.device_nbr = value
 
-            # Rollup
-            if token == ('histo', 'rollup'):
-                # Nombre d'heures entre chaque relevé, 1 à 24 heures
+            # Histo
+            if token == ('histo', 'histo'):
+                # Jour ou semaine
                 value = int(value)
-                if value < 1: value = 1
-                if value > 24: value = 24
+                if value == "jour":
+                    value = "jour"
+                if value == "semaine":
+                    value = "semaine"
                 # Save in ini
-                self.config.set('', '', value)
+                self.config.set('histo', 'histo', value)
+                self.reset = 1
 
-            # from_ et to = 2020-01-10
-            if token == ('histo', 'from_'):
-                # Vérification de la cohérence de la date
-                try:
-                    d = value.split("-")
-                except:
-                    d = ["2020", "01", "01"]
-                try:
-                    # dt = objet datetime
-                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
-                except:
-                    d = ["2020", "01", "01"]
-                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
-                print("from_ datetime", dt)
-                # TODO imposer from < date actuelle
-                new_value = d[0] + "-" + d[1] + "-" + d[2]
-                # Save in ini
-                self.config.set('histo', 'from_', new_value)
+    def check_request_url(self, url):
+        """url doit se terminer par /"""
 
-            if token == ('histo', 'to_'):
-                # Vérification de la cohérence de la date
-                try:
-                    d = value.split("-")
-                except:
-                    d = ["2020", "01", "01"]
-                try:
-                    # dt = objet datetime
-                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
-                except:
-                    d = ["2020", "01", "01"]
-                    dt = datetime.date(int(d[0]), int(d[1]), int(d[2]))
-                print("to_ datetime", dt)
-                # TODO imposer to > from
-                # TODO imposer from < date actuelle
-                new_value = d[0] + "-" + d[1] + "-" + d[2]
-                # Save in ini
-                self.config.set('histo', 'to_', new_value)
+        if "api.smartcitizen.me" not in url:
+            url = None
+        if url:
+            if not url[-1] == "/":
+                url += "/"
+
+        return request_url
+
+    def get_rollup(self):
+        """API SC: rollup = str = 6m = 6 minutes
+                y years
+                M months
+                w weeks
+                d days
+                h hours
+                m minutes
+                s seconds
+                ms milliseconds
+        Si period = 1j: rollup = "6m" --> 144 valeurs
+        si period = 7j: rollup = "1h" --> 168 valeurs
+        """
+
+        if self.config.get('histo', 'histo') == "jour":
+            rollup = "6m"
+        else:
+            rollup = "1h"
+
+        return rollup
+
+    def get_from_to(self):
+        d = datetime.date.today()
+        t = d.timetuple()
+        to_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2])
+        print("Date du jour", to_)
+
+        if self.config.get('histo', 'histo') == "jour":
+            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 1)
+        else:
+            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 7)
+
+
+        return from_ , to_
 
     def do_quit(self):
         SmartCitizenApp.get_running_app().stop()

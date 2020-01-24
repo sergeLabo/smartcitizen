@@ -66,7 +66,7 @@ class SmartCitizenRequests:
 
         histo_url = self.url + str(self.device_nbr)\
                     + '/readings?sensor_id=' + str(id_)\
-                    + '&rollup=' + str(rollup) + 'h&from='\
+                    + '&rollup=' + str(rollup) + '&from='\
                     + from_ + '&to=' + to_
 
         return histo_url
@@ -255,10 +255,12 @@ if __name__ == '__main__':
 
     # histo
     id_ = 113
-    rollup = 4
+    rollup = "4h"
     from_ = "2020-01-01"
     to_ = "2020-01-15"
     histo_url = scr.get_histo_url(id_, rollup, from_, to_)
+    # http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=6m&from=2020-1-23&to=2020-1-24
+    print(histo_url)
     resp = scr.get_resp_dict(histo_url)
     h = scr.get_histo(resp)
     print("h", h)
