@@ -21,20 +21,20 @@
 #######################################################################
 
 
-__version__ = '0.21'
+__version__ = '0.23'
 
 
 import kivy
 kivy.require('1.11.1')
 
 # Pour mon PC mais perturbe l'affichage sur android
-import sys
-if sys.platform == 'linux':
-    from kivy.core.window import Window
-    # Pour simuler l'écran de mon tél qui fait 1280*720
-    k = 0.80
-    WS = (int(720*k), int(1280*k))
-    Window.size = WS
+# #import sys
+# #if sys.platform == 'linux':
+    # #from kivy.core.window import Window
+    # ## Pour simuler l'écran de mon tél qui fait 1280*720
+    # #k = 1
+    # #WS = (int(720*k), int(1280*k))
+    # #Window.size = WS
 
 import textwrap
 import datetime
@@ -46,16 +46,22 @@ from kivy.properties import StringProperty, ObjectProperty, ListProperty
 from kivy.clock import Clock
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
-from kivy_garden.graph import Graph, MeshLinePlot
+from kivy_garden.graph import Graph, MeshLinePlot, LinePlot
 from kivy.uix.popup import Popup
 
 from smartcitizen_requests import SmartCitizenRequests
+
+
+NORME = {   "PM10": (30 ,"µg/m3"),
+            "PM2,5": (10, "µg/m3")}
 
 
 class Screen2(Screen):
 
     graph_id = ObjectProperty()
     titre = StringProperty("Capteur")
+    # Affichage sur le bouton au dessus du graphique
+    period = StringProperty("Période")
 
     def __init__(self, **kwargs):
         """self.graph ne peut pas être initié ici.
@@ -65,15 +71,23 @@ class Screen2(Screen):
         super().__init__(**kwargs)
 
         self.sensor_id = None
-        self.unit = ""
+        self.unit_x = ""
+        self.unit_y = ""
         self.graph = None
         self.histo = []
         self.histo_data = None
-        self.y_major = 1
+        self.y_major = 0
         self.titre = "Capteur"
-        self.period = None
-        self.abscissa = 100
         self.reset = None
+        self.xlabel = ""
+        self.duration = None
+
+        # Initialisation de la courbe avec sa couleur
+        self.curve_plot = MeshLinePlot(color=[0, 0, 0, 1])
+        self.curve_plot.points = [(0, 0)]*101
+
+        # horizontal_line
+        self.line_plot = LinePlot(line_width=2, color=[1, 0, 0.5, 1])
 
     def get_datetime(self, date):
         """de "2020-01-15", retourne datetime.date"""
@@ -98,42 +112,56 @@ class Screen2(Screen):
         #   description                     unit  value
         self.labels_text = screen1.labels_text
 
-        self.create_graph()
-
-        # # Construction de la courbe
-        # Initialisation de la courbe avec sa couleur
-        self.plot = MeshLinePlot(color=[0, 0, 0, 1])
-        self.plot.points = [(0, 0)]*101
-
-        self.graph.add_plot(self.plot)
-
-        self.ids.graph_id.add_widget(self.graph)
-
-        # ## Actualisation de la courbe
-        # #Clock.schedule_interval(self.update, 2)
+        if self.y_major:  # int
+            if len(self.histo) > 20:  # TODO ? utile
+                self.create_graph()
 
     def create_graph(self):
         """Création du graph seul et pas d'application au widget"""
 
         print("Appel de la création du graph ..")
 
-        # Paramètres du graph
-        self.xlabel = "Historique en heures"
-        self.ylabel = "1 correspond à  " + str(self.y_major) + " " + self.unit
+        if self.xlabel == "minutes":
+            self.duration = "jour"
+            self.unit_x = "minutes"
+        else:
+            self.duration = "semaine"
+            self.unit_x = "heures"
+
+        # Paramètres du graph en x
+        # Jour
         self.xmin = 0
-        self.xmax = self.abscissa
+        if self.duration == "jour":
+            # un jour = 24*60 = 1440 mn
+            # 1440/6 = 240 valeurs dans l'histo
+            # self.xmax = 1440 mn
+            self.xmax = len(self.histo) * 6
+            # 1440/4 = 360
+            self.x_ticks_major = 360
+            self.x_ticks_minor = 6 # divise en 6 les 360
+
+        # Semaine
+        else:
+            self.xmax = len(self.histo)
+            self.x_ticks_major = 24
+            self.x_ticks_minor = 6  # divise en 6 les 24
+
+        # Paramètres du graph en y
         self.ymin = 0
-        self.ymax = 1
-        print("self.y_major", self.y_major)
+        self.ymax = self.y_major
+        self.ylabel = self.unit_y
+        self.y_ticks_major = self.y_major/10
+        self.y_ticks_minor = 0  #5
 
         # Je crée ou recrée
         self.graph = Graph( background_color=(0.8, 0.8, 0.8, 1),
                             border_color=(0, 0.1, 0.1, 1),
                             xlabel=self.xlabel,
                             ylabel=self.ylabel,
-                            x_ticks_minor=5,
-                            x_ticks_major=25,
-                            y_ticks_major=0.10,
+                            x_ticks_minor=self.x_ticks_minor,
+                            x_ticks_major=self.x_ticks_major,
+                            #y_ticks_minor=self.y_ticks_minor,
+                            y_ticks_major=self.y_ticks_major,
                             x_grid_label=True,
                             y_grid_label=True,
                             padding=5,
@@ -143,18 +171,28 @@ class Screen2(Screen):
                             xmax=self.xmax,
                             ymin=self.ymin,
                             ymax=self.ymax,
-                            tick_color=(1, 0, 0, 1),
+                            tick_color=(1, 0, 1, 1),
                             label_options={'color': (0.2, 0.2, 0.2, 1)})
 
-    def update(self):  # , dt):
-        """Update de cette class toutes les 2 secondes"""
+        self.graph.add_plot(self.curve_plot)
+        self.graph.add_plot(self.line_plot)
+        self.ids.graph_id.add_widget(self.graph)
+
+    def update(self):
+        """Update de cette class toutes les 2 secondes,
+        appelée par set_histo() de set_histo(
+        """
 
         if self.reset:
             self.reset = None
+            self.y_major = 0
             self.graph_init()
+        else:
+            if not self.graph:
+                self.graph_init()
 
         # Reset des points
-        self.plot.points = []
+        self.curve_plot.points = []
 
         # Echelle des y
         y_major = self.get_y_major()
@@ -164,11 +202,15 @@ class Screen2(Screen):
             self.graph_init()
 
         # Apply value to plot
-        self.abscissa = len(self.histo)
-        print(self.abscissa)
-        for i in range(self.abscissa):
-            y = self.histo[i][1]/self.y_major
-            self.plot.points.append([i, y])
+        for i in range(len(self.histo)):
+            y = self.histo[i][1]
+            if self.duration == "jour":
+                self.curve_plot.points.append([i * 6, y])
+            else:
+                self.curve_plot.points.append([i, y])
+
+        # Construit horizontal line
+        self.apply_horizontal_line()
 
     def get_y_major(self):
         """Le maxi de l'echelle des y"""
@@ -176,27 +218,50 @@ class Screen2(Screen):
         # Recherche du maxi
         maxi = 0
         for couple in self.histo:
+            # #print(couple)
             if couple[1] > maxi:
                 maxi = couple[1]
 
-        # Pour éviter que la courbe touche le maxi
-        maxi *= 1.1
-
         # Définition de l'échelle sur y soit 0 à y_major
-        if 1 < maxi < 10:
-            y_major = round(int(maxi), -0)
-        elif 10 <= maxi < 100:
-            y_major = round(int(maxi), -1)
-        elif 100 <= maxi < 1000:
-            y_major = round(int(maxi), -2)
-        elif 1000 <= maxi < 10000:
-            y_major = round(int(maxi), -3)
-        elif 10000 <= maxi < 100000:
-            y_major = round(int(maxi), -4)
-        else:
-            y_major = 1
 
+        if 1 <= maxi < 10:
+            a = 1
+        elif 10 <= maxi < 100:
+            a = 10
+        elif 100 <= maxi < 1000:
+            a = 100
+        elif 1000 <= maxi < 10000:
+            a = 1000
+        elif 10000 <= maxi < 100000:
+            a = 10000
+        else:
+            a = 1
+        # 756 --> 800 int(756/100) + 1 * 1000
+        if maxi < 0:
+            y_major = 1
+        else:
+            y_major = (int(maxi*1.1/a) + 1) * a
+
+        # #print("maxi:", maxi, "y_major", y_major)
         return y_major
+
+    def apply_horizontal_line(self):
+        """si self.y_major = 90 équivalent à 1
+        y = 30 devient 30/90*1=0.33
+        """
+
+        if self.graph:
+            y = 0
+            if self.titre:
+                if self.y_major != 0:
+                    if "PM 10" in self.titre:
+                        y = 30  # 30
+                    if "PM 2.5" in self.titre:
+                        y = 10  # 10
+            if y:
+                self.line_plot.points = [(i, y) for i in range(self.xmax)]
+            else:
+                self.line_plot.points = []
 
 
 class OwnerInfo(Popup):
@@ -233,9 +298,9 @@ class Screen1(Screen):
         screen2 = self.manager.get_screen("screen2")
         screen2.sensor_id = sensor_id
         if len(self.labels_text[index].split(" ")) > 1:
-            screen2.unit = self.labels_text[index].split(" ")[1]
+            screen2.unit_y = self.labels_text[index].split(" ")[1]
         else:
-            screen2.unit = ""
+            screen2.unit_y = ""
         screen2.titre = self.btns_text[index]
         screen2.graph_init()
         self.manager.current = "screen2"
@@ -255,7 +320,8 @@ class MainScreen(Screen):
             try:
                 screen1 = self.manager.get_screen("screen1")
                 toto = screen1.owner_titre.splitlines()[0]
-                self.owner = 'Suivi des capteurs de\n{}'.format(toto)
+                self.owner = 'Suivi des capteurs de\n{:^30}'.format(toto)
+                #             123456789012345678901  21 chars
             except:
                 self.owner = ""
 
@@ -275,7 +341,7 @@ class SmartCitizen(BoxLayout):
     resp = scr.get_resp_dict(scr.instant_url)
 
     id_ = 55
-    rollup = 4
+    rollup = 4h
     from_ = "2020-01-01"
     to_ = "2020-01-15"
     histo_url = scr.get_histo_url(id_, rollup, from_, to_)
@@ -332,7 +398,10 @@ class SmartCitizen(BoxLayout):
         """
 
         smart_req = SmartCitizenRequests(self.app.url, self.app.device_nbr)
-        resp = smart_req.get_resp_dict(smart_req.instant_url)
+        try:
+            resp = smart_req.get_resp_dict(smart_req.instant_url)
+        except:
+            resp = None
 
         # Détail du owner
         owner = smart_req.get_owner(resp)
@@ -360,7 +429,7 @@ class SmartCitizen(BoxLayout):
         if sensors:
             x = min(len(sensors), 16)
             for d in range(x):
-                description = textwrap.fill(sensors[d][0], 30)
+                description = textwrap.fill(sensors[d][0], 24)
                 screen1.btns_text[d] = description
                 t = str(round(sensors[d][2], 2))\
                         + " "\
@@ -420,20 +489,44 @@ class SmartCitizen(BoxLayout):
                                             self.app.rollup,
                                             self.app.from_,
                                             self.app.to_)
-        resp = smart_req.get_resp_dict(histo_url)
 
-        histo = smart_req.get_histo(resp)
+        # #print(self.app.rollup, self.app.from_, self.app.to_, "\n", histo_url)
+
+        try:
+            resp = smart_req.get_resp_dict(histo_url)
+            histo = smart_req.get_histo(resp)
+        except:
+            histo = []
+
         self.set_histo(histo)
 
     def set_histo(self, histo):
         if histo:
-            if len(histo[0]) > 1:
+            if len(histo[0]) > 1:  # Pas (0, 0) de init
+                # Inversion de la liste histo
+                histo.reverse()
+
                 # Repord dans l'écran 2
                 screen2 = self.ids.sm.get_screen("screen2")
                 screen2.histo = histo
+                screen2.histo_data = (  self.app.rollup,
+                                        self.app.from_,
+                                        self.app.to_)
+
+                # #for h in histo:
+                    # ## '2020-01-25T23:00:30Z'
+                    # #print(datetime.datetime.strptime(h[0],
+                            # #'%Y-%m-%dT%H:%M:%SZ'), h[1])
+
+                if self.app.rollup == "6m":
+                    screen2.period = "Historique sur un jour"
+                    screen2.xlabel = "minutes"
+
+                if self.app.rollup == "1h":
+                    screen2.period = "Historique sur une semaine"
+                    screen2.xlabel = "heures"
+
                 screen2.update()
-                screen2.histo_data = (self.app.rollup, self.app.from_,
-                                            self.app.to_)
 
 
 class SmartCitizenApp(App):
@@ -454,8 +547,7 @@ class SmartCitizenApp(App):
     def build_config(self, config):
 
         config.setdefaults("histo",
-                          {"rollup": "6m",
-                           "histo": "jour"})
+                          {"histo": "jour"})
 
         config.setdefaults("url",
                           {"url": "http://api.smartcitizen.me/v0/devices/",
@@ -521,14 +613,52 @@ class SmartCitizenApp(App):
             # Histo
             if token == ('histo', 'histo'):
                 # Jour ou semaine
-                value = int(value)
                 if value == "jour":
-                    value = "jour"
-                if value == "semaine":
-                    value = "semaine"
+                    self.rollup = "6m"
+                else:
+                    self.rollup = "1h"
+                # Modif des dates
+                self.from_ , self.to_ = self.get_from_to()
                 # Save in ini
                 self.config.set('histo', 'histo', value)
                 self.reset = 1
+
+    def set_rollup_from_to(self):
+        """Appelé par appui sur root.period dans screen2
+        self.to ne change pas
+        """
+
+        d = datetime.date.today()
+        t = d.timetuple()
+        to_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2])
+
+        if self.rollup == "6m":
+            self.rollup = "1h"  # histo de la semaine
+            self.from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 7)
+
+        elif self.rollup == "1h":
+            self.rollup = "6m"  # histo du jour
+            self.from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 1)
+            print(self.from_)
+
+        self.reset = 1
+
+    def get_from_to(self):
+        """Pour appel avec on_config_change seulement
+        Répétition avec set_rollup_from_to"""
+        # TODO
+
+        d = datetime.date.today()
+        t = d.timetuple()
+        to_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2])
+        print("Date du jour", to_)
+
+        if self.config.get('histo', 'histo') == "jour":
+            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 1)
+        else:
+            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 7)
+
+        return from_ , to_
 
     def check_request_url(self, url):
         """url doit se terminer par /"""
@@ -551,7 +681,7 @@ class SmartCitizenApp(App):
                 m minutes
                 s seconds
                 ms milliseconds
-        Si period = 1j: rollup = "6m" --> 144 valeurs
+        Si period = 1j: rollup = "6m" --> 1440 valeurs
         si period = 7j: rollup = "1h" --> 168 valeurs
         """
 
@@ -561,20 +691,6 @@ class SmartCitizenApp(App):
             rollup = "1h"
 
         return rollup
-
-    def get_from_to(self):
-        d = datetime.date.today()
-        t = d.timetuple()
-        to_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2])
-        print("Date du jour", to_)
-
-        if self.config.get('histo', 'histo') == "jour":
-            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 1)
-        else:
-            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 7)
-
-
-        return from_ , to_
 
     def do_quit(self):
         SmartCitizenApp.get_running_app().stop()
@@ -587,3 +703,12 @@ def dir_detail(objet):
 
 if __name__ == '__main__':
     SmartCitizenApp().run()
+
+"""
+répond la veille
+http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=6m&from=2020-1-26&to=2020-1-27
+Ne répond rien
+http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=6m&from=2020-1-27&to=2020-1-27
+
+
+"""
