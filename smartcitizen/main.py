@@ -42,18 +42,28 @@ import datetime
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import StringProperty, ObjectProperty, ListProperty
 from kivy.clock import Clock
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy_garden.graph import Graph, MeshLinePlot, LinePlot
 from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.graphics import Color, Rectangle
 
 from smartcitizen_requests import SmartCitizenRequests
 
 
 NORME = {   "PM10": (30 ,"µg/m3"),
             "PM2,5": (10, "µg/m3")}
+
+class MyLabel(Label):
+    def on_size(self, *args):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            Color(0, 1, 0, 0.25)
+            Rectangle(pos=self.pos, size=self.size)
 
 
 class Screen2(Screen):
@@ -256,8 +266,10 @@ class Screen2(Screen):
                 if self.y_major != 0:
                     if "PM 10" in self.titre:
                         y = 30  # 30
+                        self.xlabel += ": en rouge valeur réglementaire maxi"
                     if "PM 2.5" in self.titre:
                         y = 10  # 10
+                        self.xlabel += ": en rouge valeur réglementaire maxi"
             if y:
                 self.line_plot.points = [(i, y) for i in range(self.xmax)]
             else:

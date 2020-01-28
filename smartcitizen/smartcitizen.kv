@@ -51,7 +51,7 @@
         Label:  # logo smart
             size_hint_y: 0.25
             text: 'Smart Citizen'
-            font_size: "50sp"
+            font_size: "50dp"
         BoxLayout:
             size_hint_y: 0.55
         BoxLayout:  # le button en bas au centre
@@ -66,7 +66,7 @@
                     background_color: 0.8, 0.8, 0.8, 1
                     text: root.owner
                     color: 1, 0, 0.5, 1
-                    font_size: "20sp"
+                    font_size: "20dp"
                     on_release: app.root.ids.sm.current = "screen1"
                 BoxLayout:
                     size_hint_x: 0.2
@@ -94,24 +94,24 @@
     name: 'screen1'
     BoxLayout:
         orientation: 'vertical'
-        Button:
+        Button:  # Nom du owner
             background_normal: ''
             background_color: 0.8, 0.8, 0.8, 1
             size_hint_y: 0.10
             markup: True
-            font_size: "22sp"
+            font_size: "22dp"
             text: '[b]' + root.owner_titre + '[/b]'
             color: 1, 0, 0.5, 1
             on_release: root.display_info()
-        BoxLayout:
+        BoxLayout:  # scroll
             size_hint_y: 0.90
             orientation: 'vertical'
-            ScrollView:
+            ScrollView:  # scroll
                 size: self.size
                 do_scroll_x: False
                 do_scroll_y: True
 
-                GridLayout:
+                GridLayout:  # scroll
                     id: blanche
                     size_hint_y: None
                     cols: 1
@@ -123,14 +123,14 @@
 
                     BoxLayout: # détails des colonnes
                         orientation: 'horizontal'
-                        Label:
+                        Label:  # Type du capteur
                             canvas.before:
                                 Color:
                                     rgba: 0.4, 0.4, 0.4, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
-                            size_hint_x: 0.60
+                            size_hint_x: 0.59
                             markup: True
                             text: '[b]Type du capteur[/b]'
                             color: 1, 1, 1, 1
@@ -138,14 +138,16 @@
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
-                        Label:
+                        BoxLayout:  # vide pour séparer
+                            size_hint_x: 0.02
+                        Label:  # Valeur instantanée
                             canvas.before:
                                 Color:
                                     rgba: 0.4, 0.4, 0.4, 1
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
-                            size_hint_x: 0.40
+                            size_hint_x: 0.39
                             markup: True
                             text: '[b]Valeur instantanée[/b]'
                             color: 1, 1, 1, 1
@@ -159,7 +161,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[0]
@@ -184,7 +186,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[1]
@@ -209,7 +211,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[2]
@@ -234,7 +236,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[3]
@@ -259,7 +261,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[4]
@@ -284,7 +286,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[5]
@@ -309,7 +311,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[6]
@@ -334,7 +336,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[7]
@@ -359,7 +361,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[8]
@@ -384,7 +386,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[9]
@@ -409,7 +411,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[10]
@@ -434,7 +436,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[11]
@@ -459,7 +461,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[12]
@@ -484,7 +486,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[13]
@@ -509,7 +511,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[14]
@@ -534,7 +536,7 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16sp"
+                            font_size: "16dp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
                             text: root.btns_text[15]
@@ -557,8 +559,9 @@
 
 <Screen2>:
     name: 'screen2'
-    BoxLayout:
+    BoxLayout:  # boite globale
         orientation: 'vertical'
+        id: boite_globale
         BoxLayout:  # box en haut
             size_hint_y: 0.10
             BoxLayout:
