@@ -21,23 +21,25 @@
 #######################################################################
 
 
-__version__ = '0.23'
+__version__ = '1.00'
 
 
 import kivy
 kivy.require('1.11.1')
 
-# Pour mon PC mais perturbe l'affichage sur android
-# #import sys
-# #if sys.platform == 'linux':
-    # #from kivy.core.window import Window
-    # ## Pour simuler l'écran de mon tél qui fait 1280*720
-    # #k = 1
-    # #WS = (int(720*k), int(1280*k))
-    # #Window.size = WS
+# ## Pour mon PC mais perturbe l'affichage sur android
+import sys
+if sys.platform == 'linux':
+    from kivy.core.window import Window
+    # Pour simuler l'écran de mon tél qui fait 1280*720
+    k = 1
+    WS = (int(720*k), int(1280*k))
+    Window.size = WS
 
+from time import sleep
 import textwrap
 import datetime
+import threading
 
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -57,13 +59,6 @@ from smartcitizen_requests import SmartCitizenRequests
 
 NORME = {   "PM10": (30 ,"µg/m3"),
             "PM2,5": (10, "µg/m3")}
-
-class MyLabel(Label):
-    def on_size(self, *args):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(0, 1, 0, 0.25)
-            Rectangle(pos=self.pos, size=self.size)
 
 
 class Screen2(Screen):
@@ -99,6 +94,9 @@ class Screen2(Screen):
         # horizontal_line
         self.line_plot = LinePlot(line_width=2, color=[1, 0, 0.5, 1])
 
+        # Appel tous les 2 secondes
+        Clock.schedule_interval(self.update, 2)
+
     def get_datetime(self, date):
         """de "2020-01-15", retourne datetime.date"""
         d = date.split("-")
@@ -123,8 +121,10 @@ class Screen2(Screen):
         self.labels_text = screen1.labels_text
 
         if self.y_major:  # int
-            if len(self.histo) > 20:  # TODO ? utile
+            if len(self.histo) > 20:
                 self.create_graph()
+            else:
+                self.reset = 1
 
     def create_graph(self):
         """Création du graph seul et pas d'application au widget"""
@@ -188,9 +188,9 @@ class Screen2(Screen):
         self.graph.add_plot(self.line_plot)
         self.ids.graph_id.add_widget(self.graph)
 
-    def update(self):
+    def update(self, dt):
         """Update de cette class toutes les 2 secondes,
-        appelée par set_histo() de set_histo(
+        appelée par set_histo() de SmartCitizen
         """
 
         if self.reset:
@@ -372,23 +372,37 @@ class SmartCitizen(BoxLayout):
         self.count = 0
 
         # premier appel au lancement
-        Clock.schedule_once(self.update)
+        # #Clock.schedule_once(self.update)
+        Clock.schedule_once(self.update_thread)
 
-        # Appel tous les 2 secondes
-        Clock.schedule_interval(self.update, 2)
+        # ## Appel tous les 2 secondes
+        # #Clock.schedule_interval(self.update, 2)
+        pass
 
-    def update(self, dt):
-        self.get_and_apply_instant_values()
+    def update(self):  #, dt):
 
-        # Report dans l'écran 2
-        screen2 = self.ids.sm.get_screen("screen2")
+        while self.app.loop:
+            print("update_thread")
+            self.get_and_apply_instant_values()
 
-        sensor_id = screen2.sensor_id
-        if sensor_id:
-            self.get_histo(sensor_id)
-        if self.app.reset:
-            screen2.reset = 1
-            self.app.reset = None
+            # Report dans l'écran 2
+            screen2 = self.ids.sm.get_screen("screen2")
+
+            sensor_id = screen2.sensor_id
+            if sensor_id:
+                self.get_histo(sensor_id)
+                self.set_histo()
+
+            if self.app.reset:
+                screen2.reset = 1
+                self.app.reset = None
+
+            sleep(1)
+
+    def update_thread(self, dt):
+        thread_update = threading.Thread(target=self.update)
+        thread_update.setDaemon(True)
+        thread_update.start()
 
     def get_and_apply_instant_values(self):
         """
@@ -428,7 +442,7 @@ class SmartCitizen(BoxLayout):
     def apply_sensors(self, sensors):
         """Maj de la liste des capteurs avec unit et value"""
 
-        # Pour bel affichage seulement
+        # Pour beau print seulement
         self.count += 1
 
         screen1 = self.ids.sm.get_screen("screen1")
@@ -502,30 +516,29 @@ class SmartCitizen(BoxLayout):
                                             self.app.from_,
                                             self.app.to_)
 
-        # #print(self.app.rollup, self.app.from_, self.app.to_, "\n", histo_url)
+        # #print(histo_url)
 
         try:
             resp = smart_req.get_resp_dict(histo_url)
-            histo = smart_req.get_histo(resp)
+            self.histo = smart_req.get_histo(resp)
         except:
-            histo = []
+            self.histo = []
 
-        self.set_histo(histo)
+    def set_histo(self):
 
-    def set_histo(self, histo):
-        if histo:
-            if len(histo[0]) > 1:  # Pas (0, 0) de init
-                # Inversion de la liste histo
-                histo.reverse()
+        if self.histo:
+            if len(self.histo[0]) > 1:  # Pas (0, 0) de init
+                # Inversion de la liste self.histo
+                self.histo.reverse()
 
                 # Repord dans l'écran 2
                 screen2 = self.ids.sm.get_screen("screen2")
-                screen2.histo = histo
+                screen2.histo = self.histo
                 screen2.histo_data = (  self.app.rollup,
                                         self.app.from_,
                                         self.app.to_)
 
-                # #for h in histo:
+                # #for h in self.histo:
                     # ## '2020-01-25T23:00:30Z'
                     # #print(datetime.datetime.strptime(h[0],
                             # #'%Y-%m-%dT%H:%M:%SZ'), h[1])
@@ -538,12 +551,13 @@ class SmartCitizen(BoxLayout):
                     screen2.period = "Historique sur une semaine"
                     screen2.xlabel = "heures"
 
-                screen2.update()
-
 
 class SmartCitizenApp(App):
 
     def build(self):
+
+        # Pour le thread
+        self.loop = 1
 
         # SmartCitizen viendra chercher ces attributs
         self.device_nbr = self.config.get('url', 'kit')
@@ -637,38 +651,60 @@ class SmartCitizenApp(App):
 
     def set_rollup_from_to(self):
         """Appelé par appui sur root.period dans screen2
-        self.to ne change pas
+        self.to_ ne change pas
         """
 
-        d = datetime.date.today()
-        t = d.timetuple()
-        to_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2])
+        # Date heure sans les microsecond
+        dt = datetime.datetime.now().replace(microsecond=0).isoformat()
+        # 2020-01-29%2016:03:45
+        to_ = dt.replace("T", "%20")
+
+        # datetime du jour
+        dtdt = datetime.datetime.now()
+        # le jour
+        to_day = dtdt.day
+        # datetime de j-1 ou j-7
+        j_moins_1 = dtdt.replace(day=(to_day-1))
+        j_moins_7 = dtdt.replace(day=(to_day-7))
 
         if self.rollup == "6m":
             self.rollup = "1h"  # histo de la semaine
-            self.from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 7)
+            from_ = j_moins_7.replace(microsecond=0).isoformat()
+            self.from_ = from_.replace("T", "%20")
 
         elif self.rollup == "1h":
             self.rollup = "6m"  # histo du jour
-            self.from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 1)
-            print(self.from_)
+            from_ = j_moins_1.replace(microsecond=0).isoformat()
+            self.from_ = from_.replace("T", "%20")
 
         self.reset = 1
 
     def get_from_to(self):
         """Pour appel avec on_config_change seulement
-        Répétition avec set_rollup_from_to"""
-        # TODO
 
-        d = datetime.date.today()
-        t = d.timetuple()
-        to_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2])
-        print("Date du jour", to_)
+        depuis 2020-01-28%2016:27:14 jusqu'à 2020-01-29%2016:27:14
+               2020-01-28   16:27:14 jusqu'à 2020-01-29   16:27:14
+        """
+
+        # Date heure sans les microsecond
+        dt = datetime.datetime.now().replace(microsecond=0).isoformat()
+        # 2020-01-29%2016:03:45
+        to_ = dt.replace("T", "%20")
+
+        # datetime du jour
+        dtdt = datetime.datetime.now()
+        # le jour
+        to_day = dtdt.day
+        # datetime de j-1 ou j-7
+        j_moins_1 = dtdt.replace(day=(to_day-1))
+        j_moins_7 = dtdt.replace(day=(to_day-7))
 
         if self.config.get('histo', 'histo') == "jour":
-            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 1)
+            from_ = j_moins_1.replace(microsecond=0).isoformat()
+            from_ = from_.replace("T", "%20")
         else:
-            from_ = str(t[0]) + "-" + str(t[1]) + "-" + str(t[2] - 7)
+            from_ = j_moins_7.replace(microsecond=0).isoformat()
+            from_ = from_.replace("T", "%20")
 
         return from_ , to_
 
@@ -705,6 +741,7 @@ class SmartCitizenApp(App):
         return rollup
 
     def do_quit(self):
+        self.loop = 0
         SmartCitizenApp.get_running_app().stop()
 
 
@@ -715,12 +752,3 @@ def dir_detail(objet):
 
 if __name__ == '__main__':
     SmartCitizenApp().run()
-
-"""
-répond la veille
-http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=6m&from=2020-1-26&to=2020-1-27
-Ne répond rien
-http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=6m&from=2020-1-27&to=2020-1-27
-
-
-"""

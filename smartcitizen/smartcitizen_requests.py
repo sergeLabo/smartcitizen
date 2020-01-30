@@ -55,13 +55,9 @@ class SmartCitizenRequests:
         """
         id_ = 55
         rollup = 4
-        from_ = '2020-01-01'
-        to_ = '2020-01-15'
-
-        histo_url = 'http://api.smartcitizen.me/v0/devices/9525/readings?sens
-        or_id=55&rollup=4h&from=2020-01-01&to=2020-01-15'
-                     http://api.smartcitizen.me/v0/devices/9525/readings?sens
-        or_id=55&rollup=4h&from=2020-01-01&to=2020-01-15
+        from_ = '2020-01-01%2000:00'
+        to_ = '2020-01-15%2012:33:52'
+        https://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=1h&from=2020-01-29%2000:00:00&to=2020-01-29%2012:33:52
         """
 
         histo_url = self.url + str(self.device_nbr)\
@@ -237,34 +233,35 @@ if __name__ == '__main__':
     device_nbr = 9525
     scr = SmartCitizenRequests(url, device_nbr)
 
-    resp = scr.get_resp_dict(scr.instant_url)
-
-    # instant
-    owner = scr.get_owner(resp)
-    print("owner")
-    pp.pprint(owner)
-    sensors = scr.get_sensors(resp)
-    print("sensors")
-    pp.pprint(sensors)
-    kit = scr.get_kit(resp)
-    print("kit")
-    pp.pprint(kit)
-    data = scr.get_data(resp)
-    print("data")
-    pp.pprint(data)
+    # ## instant
+    # #resp = scr.get_resp_dict(scr.instant_url)
+    # #owner = scr.get_owner(resp)
+    # #print("owner")
+    # #pp.pprint(owner)
+    # #sensors = scr.get_sensors(resp)
+    # #print("sensors")
+    # #pp.pprint(sensors)
+    # #kit = scr.get_kit(resp)
+    # #print("kit")
+    # #pp.pprint(kit)
+    # #data = scr.get_data(resp)
+    # #print("data")
+    # #pp.pprint(data)
 
     # histo
     id_ = 113
-    rollup = "4h"
-    from_ = "2020-01-01"
-    to_ = "2020-01-15"
+    rollup = "1h"
+    from_ = "2020-01-29"
+    to_ = "2020-01-29"
     histo_url = scr.get_histo_url(id_, rollup, from_, to_)
     # http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=6m&from=2020-1-23&to=2020-1-24
-    print(histo_url)
     resp = scr.get_resp_dict(histo_url)
-    h = scr.get_histo(resp)
-    print("h", h)
-    print(len(h))
+    print(resp)
+    print(histo_url)
+    # http://api.smartcitizen.me/v0/devices/9525/readings?sensor_id=113&rollup=1h&from=2020-01-28&to=2020-01-29
+    # #h = scr.get_histo(resp)
+    # #print("h", h)
+    # #print(len(h))
     # #pp.pprint(h)
 
 # Réponse du script

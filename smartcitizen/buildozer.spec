@@ -9,7 +9,7 @@ source.dir = .
 
 source.include_exts = py,png,jpg,kv,atlas
 
-source.exclude_dirs = old, bin, recherche, garden_graph_example
+source.exclude_dirs = old,bin,recherche,garden_graph_example
 
 source.include_patterns = images/*.jpg,images/*.png
 
