@@ -12,7 +12,7 @@
                 title: '[b]Smart Citizen[/b]'
                 with_previous: False
                 app_icon: './images/icon_labo.png'
-                color: (1, 0, 0.5, 1)
+                color: (0.8, 0.8, 0.8, 1)
                 font_size: '[size]40sp[/size]'
             ActionOverflow:
             # #ActionButton:
@@ -45,7 +45,6 @@
             pos: self.pos
             size: self.size
             source: './images/labo_bgd.png'
-
     BoxLayout:
         orientation: "vertical"
         Label:  # logo smart
@@ -53,23 +52,39 @@
             text: 'Smart Citizen'
             font_size: "50dp"
         BoxLayout:
-            size_hint_y: 0.55
-        BoxLayout:  # le button en bas au centre
-            size_hint_y: 0.10
+            size_hint_y: 0.50
+        BoxLayout:
+            size_hint_y: 0.15
             GridLayout:
-                cols: 3
+                cols: 5
                 BoxLayout:
-                    size_hint_x: 0.2
-                Button:
-                    size_hint_x: 0.6
+                    size_hint_x: 0.1
+                Button:  # appel de options
+                    font_size: "20sp"
+                    halign: 'center'
+                    valign: 'center'
+                    text_size: self.size
+                    size_hint_x: 0.39
+                    background_normal: ''
+                    background_color: 0.8, 0.8, 0.8, 1
+                    text: "Changer de kit"
+                    color: 1, 0, 0.5, 1
+                    on_release: app.open_settings()
+                BoxLayout:
+                    size_hint_x: 0.02
+                Button:  # appel de screen1
+                    font_size: "20sp"
+                    halign: 'center'
+                    valign: 'center'
+                    text_size: self.size
+                    size_hint_x: 0.39
                     background_normal: ''
                     background_color: 0.8, 0.8, 0.8, 1
                     text: root.owner
                     color: 1, 0, 0.5, 1
-                    font_size: "20dp"
                     on_release: app.root.ids.sm.current = "screen1"
                 BoxLayout:
-                    size_hint_x: 0.2
+                    size_hint_x: 0.1
         BoxLayout:
             size_hint_y: 0.10
 
@@ -134,7 +149,7 @@
                             markup: True
                             text: '[b]Type du capteur[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -151,7 +166,7 @@
                             markup: True
                             text: '[b]Valeur instantanée[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -161,9 +176,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[0]
                             on_release: root.apply_go_to_screen2(0)
                         Label:
@@ -177,7 +195,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[0] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -186,9 +204,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[1]
                             on_release: root.apply_go_to_screen2(1)
                         Label:
@@ -202,7 +223,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[1] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -211,9 +232,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[2]
                             on_release: root.apply_go_to_screen2(2)
                         Label:
@@ -227,7 +251,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[2] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -236,9 +260,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[3]
                             on_release: root.apply_go_to_screen2(3)
                         Label:
@@ -252,7 +279,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[3] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -261,9 +288,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[4]
                             on_release: root.apply_go_to_screen2(4)
                         Label:
@@ -277,7 +307,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[4] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -286,9 +316,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[5]
                             on_release: root.apply_go_to_screen2(5)
                         Label:
@@ -302,7 +335,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[5] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -311,9 +344,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[6]
                             on_release: root.apply_go_to_screen2(6)
                         Label:
@@ -327,7 +363,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[6] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -336,9 +372,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[7]
                             on_release: root.apply_go_to_screen2(7)
                         Label:
@@ -352,7 +391,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[7] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -361,9 +400,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[8]
                             on_release: root.apply_go_to_screen2(8)
                         Label:
@@ -377,7 +419,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[8] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -386,9 +428,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[9]
                             on_release: root.apply_go_to_screen2(9)
                         Label:
@@ -402,7 +447,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[9] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -411,9 +456,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[10]
                             on_release: root.apply_go_to_screen2(10)
                         Label:
@@ -427,7 +475,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[10] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -436,9 +484,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[11]
                             on_release: root.apply_go_to_screen2(11)
                         Label:
@@ -452,7 +503,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[11] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -461,9 +512,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[12]
                             on_release: root.apply_go_to_screen2(12)
                         Label:
@@ -477,7 +531,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[12] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -486,9 +540,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[13]
                             on_release: root.apply_go_to_screen2(13)
                         Label:
@@ -502,7 +559,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[13] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -511,9 +568,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[14]
                             on_release: root.apply_go_to_screen2(14)
                         Label:
@@ -527,7 +587,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[14] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -536,9 +596,12 @@
                         Button:
                             background_normal: ''
                             background_color: 0.8, 0.8, 0.8, 1
-                            font_size: "16dp"
+                            font_size: "20sp"
                             color: 1, 0, 0.5, 1
                             size_hint_x: 0.60
+                            halign: 'center'
+                            valign: 'center'
+                            text_size: self.size
                             text: root.btns_text[15]
                             on_release: root.apply_go_to_screen2(15)
                         Label:
@@ -552,7 +615,7 @@
                             markup: True
                             text: '[b]' + root.labels_text[15] + '[/b]'
                             color: 1, 1, 1, 1
-                            font_size: '20sp'
+                            font_size: "20sp"
                             text_size: self.size
                             halign: 'center'
                             valign: 'middle'
@@ -562,35 +625,65 @@
     BoxLayout:  # boite globale
         orientation: 'vertical'
         id: boite_globale
-        BoxLayout:  # box en haut
+        BoxLayout:  # info capteur
             size_hint_y: 0.10
-            BoxLayout:
-                orientation: 'horizontal'
-                Button:
-                    background_normal: ''
-                    background_color: 0.8, 0.8, 0.8, 1
-                    size_hint_x: 0.30
-                    markup: True
-                    text: '[b]Retour\nà la liste\ndes capteurs[/b]'
-                    color: 1, 0, 0.5, 1
-                    on_release: app.root.ids.sm.current = "screen1"
-                Label:
-                    size_hint_x: 0.70
-                    canvas.before:
-                        Color:
-                            rgba: 0.4, 0.4, 0.4, 1
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    text: root.titre
-        Button:     # bascule semaine jour
-            size_hint_y: 0.05
-            background_normal: ''
-            background_color: 0.7, 0.7, 0.7, 1
-            markup: True
-            text: '[b]' + root.period + '[/b]'
-            color: 1, 0, 0.5, 1
-            on_release:  app.set_rollup_from_to()
+            orientation: 'horizontal'
+            Button:  # retour liste
+                background_normal: ''
+                background_color: 0.8, 0.8, 0.8, 1
+                size_hint_x: 0.40
+                text: 'Retour à la liste des capteurs'
+                font_size: "16sp"
+                halign: 'center'
+                valign: 'center'
+                text_size: self.size
+                color: 1, 0, 0.5, 1
+                on_release: app.root.ids.sm.current = "screen1"
+            Label:  # capteur
+                size_hint_x: 0.60
+                canvas.before:
+                    Color:
+                        rgba: 0.8, 0.8, 0.8, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                color: 0, 0, 0, 1
+                font_size: "16sp"
+                halign: 'center'
+                valign: 'center'
+                text_size: self.size
+                text: root.titre
+
         BoxLayout:  # graph
-            size_hint_y: 0.85
+            size_hint_y: 0.83
             id: graph_id
+
+        BoxLayout:  # info graph
+            orientation: 'horizontal'
+            size_hint_y: 0.07
+            Button:     # bascule semaine jour
+                size_hint_x: 0.40
+                background_normal: ''
+                background_color: 0.8, 0.8, 0.8, 1
+                text: "Bascule semaine/jour"
+                color: 1, 0, 0.5, 1
+                font_size: "16sp"
+                halign: 'center'
+                valign: 'center'
+                text_size: self.size
+                on_release:  app.set_rollup_from_to()
+            Label:  # Période en cours
+                size_hint_x: 0.60
+                canvas.before:
+                    Color:
+                        rgba: 0.8, 0.8, 0.8, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                color: 0, 0, 0, 1
+                font_size: "16sp"
+                halign: 'center'
+                valign: 'center'
+                text_size: self.size
+                markup: True
+                text: '[b]' + root.period + '[b]'

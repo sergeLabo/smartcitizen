@@ -21,23 +21,23 @@
 #######################################################################
 
 
-__version__ = '1.00'
+__version__ = '1.10'
 
 
 import kivy
 kivy.require('1.11.1')
 
-# ## Pour mon PC mais perturbe l'affichage sur android
-import sys
-if sys.platform == 'linux':
-    from kivy.core.window import Window
-    # Pour simuler l'écran de mon tél qui fait 1280*720
-    k = 1
-    WS = (int(720*k), int(1280*k))
-    Window.size = WS
+# Pour mon PC mais perturbe l'affichage sur android
+# #import sys
+# #if sys.platform == 'linux':
+    # #from kivy.core.window import Window
+    # ## Pour simuler l'écran de mon tél qui fait 1280*720
+    # #k = 0.8
+    # #WS = (int(720*k), int(1280*k))
+    # #Window.size = WS
 
 from time import sleep
-import textwrap
+# #import textwrap
 import datetime
 import threading
 
@@ -131,7 +131,7 @@ class Screen2(Screen):
 
         print("Appel de la création du graph ..")
 
-        if self.xlabel == "minutes":
+        if self.xlabel == "Unité en Minutes: 0 = valeur actuelle":
             self.duration = "jour"
             self.unit_x = "minutes"
         else:
@@ -155,6 +155,9 @@ class Screen2(Screen):
             self.xmax = len(self.histo)
             self.x_ticks_major = 24
             self.x_ticks_minor = 6  # divise en 6 les 24
+
+        if "PM 10" in self.titre or "PM 2.5" in self.titre:
+            self.xlabel += "\nEn rouge: valeur réglementaire maxi"
 
         # Paramètres du graph en y
         self.ymin = 0
@@ -264,12 +267,14 @@ class Screen2(Screen):
             y = 0
             if self.titre:
                 if self.y_major != 0:
+
                     if "PM 10" in self.titre:
                         y = 30  # 30
-                        self.xlabel += ": en rouge valeur réglementaire maxi"
+                        # #self.xlabel += ": en rouge valeur réglementaire maxi"
+
                     if "PM 2.5" in self.titre:
                         y = 10  # 10
-                        self.xlabel += ": en rouge valeur réglementaire maxi"
+                        # #self.xlabel += ": en rouge valeur réglementaire maxi"
             if y:
                 self.line_plot.points = [(i, y) for i in range(self.xmax)]
             else:
@@ -332,8 +337,8 @@ class MainScreen(Screen):
             try:
                 screen1 = self.manager.get_screen("screen1")
                 toto = screen1.owner_titre.splitlines()[0]
-                self.owner = 'Suivi des capteurs de\n{:^30}'.format(toto)
-                #             123456789012345678901  21 chars
+                # #self.owner = 'Suivi des capteurs de\n{:^30}'.format(toto)
+                self.owner = 'Suivi des capteurs de {}'.format(toto)
             except:
                 self.owner = ""
 
@@ -382,7 +387,6 @@ class SmartCitizen(BoxLayout):
     def update(self):  #, dt):
 
         while self.app.loop:
-            print("update_thread")
             self.get_and_apply_instant_values()
 
             # Report dans l'écran 2
@@ -455,7 +459,8 @@ class SmartCitizen(BoxLayout):
         if sensors:
             x = min(len(sensors), 16)
             for d in range(x):
-                description = textwrap.fill(sensors[d][0], 24)
+                # #description = textwrap.fill(sensors[d][0], 24)
+                description = sensors[d][0]
                 screen1.btns_text[d] = description
                 t = str(round(sensors[d][2], 2))\
                         + " "\
@@ -528,8 +533,8 @@ class SmartCitizen(BoxLayout):
 
         if self.histo:
             if len(self.histo[0]) > 1:  # Pas (0, 0) de init
-                # Inversion de la liste self.histo
-                self.histo.reverse()
+                # Le zéro correspond à la valeur actuelle
+                # #self.histo.reverse()
 
                 # Repord dans l'écran 2
                 screen2 = self.ids.sm.get_screen("screen2")
@@ -545,11 +550,11 @@ class SmartCitizen(BoxLayout):
 
                 if self.app.rollup == "6m":
                     screen2.period = "Historique sur un jour"
-                    screen2.xlabel = "minutes"
+                    screen2.xlabel = "Unité en Minutes: 0 = valeur actuelle"
 
                 if self.app.rollup == "1h":
                     screen2.period = "Historique sur une semaine"
-                    screen2.xlabel = "heures"
+                    screen2.xlabel = "Unité en Heures: 0 = valeur actuelle"
 
 
 class SmartCitizenApp(App):
