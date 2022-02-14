@@ -56,6 +56,7 @@ from kivy.graphics import Color, Rectangle
 
 from smartcitizen_requests import SmartCitizenRequests
 
+# #import android
 
 NORME = {   "PM10": (30 ,"µg/m3"),
             "PM2,5": (10, "µg/m3")}
@@ -269,12 +270,10 @@ class Screen2(Screen):
                 if self.y_major != 0:
 
                     if "PM 10" in self.titre:
-                        y = 30  # 30
-                        # #self.xlabel += ": en rouge valeur réglementaire maxi"
+                        y = 30
 
                     if "PM 2.5" in self.titre:
-                        y = 10  # 10
-                        # #self.xlabel += ": en rouge valeur réglementaire maxi"
+                        y = 10
             if y:
                 self.line_plot.points = [(i, y) for i in range(self.xmax)]
             else:
@@ -297,6 +296,12 @@ class Screen1(Screen):
 
         # Liste des id chez SmartCitizen
         self.sensor_id_list = [0]*16
+        Clock.schedule_once(self.test, 1)
+
+    def test(self, dt):
+        """test pour ajouter les 16 Label/Button ici"""
+        print(self.ids.blanche)
+        print("TODO: Continuer le code ....")
 
     def display_info(self):
         print("owner_detail\n", self.owner_detail)
@@ -377,14 +382,10 @@ class SmartCitizen(BoxLayout):
         self.count = 0
 
         # premier appel au lancement
-        # #Clock.schedule_once(self.update)
         Clock.schedule_once(self.update_thread)
 
-        # ## Appel tous les 2 secondes
-        # #Clock.schedule_interval(self.update, 2)
-        pass
-
-    def update(self):  #, dt):
+    def update(self):
+        """Boucle infinie pour mise à jour valeurs instantanées et historique"""
 
         while self.app.loop:
             self.get_and_apply_instant_values()
@@ -401,9 +402,12 @@ class SmartCitizen(BoxLayout):
                 screen2.reset = 1
                 self.app.reset = None
 
-            sleep(1)
+            sleep(2)
 
     def update_thread(self, dt):
+        """Le thread sert à ne pas avoir de requête http blocante,
+        qui bloque l'interface"""
+
         thread_update = threading.Thread(target=self.update)
         thread_update.setDaemon(True)
         thread_update.start()
@@ -751,6 +755,7 @@ class SmartCitizenApp(App):
 
 
 def dir_detail(objet):
+    """Pour développement agile"""
     for index in dir(objet):
         print(index)
 
